@@ -1,30 +1,26 @@
-import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-public class kidinfoTelegraBot extends TelegramLongPollingBot {
 
-    public static void main(String[] args) {
-        ApiContextInitializer.init();
-        TelegramBotsApi botapi = new TelegramBotsApi();
-        try {
-            botapi.registerBot(new Bot);
-        } catch (TelegramApiException ex) {
-            ex.printStackTrace();
-        }
+public class KidinfoTelegraBot extends TelegramLongPollingBot {
+
+    private static String BOT_NAME = "KininfoTelegramBot";
+    private static String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+
+    public KidinfoTelegraBot(DefaultBotOptions options) {
+        super(options);
     }
 
     public String getBotToken() {
-        return "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+        return BOT_TOKEN;
     }
 
     public void onUpdateReceived(Update update) {
-
+        
     }
 
     public String getBotUsername() {
-        return "USER";
+        return BOT_NAME;
     }
 }
