@@ -7,9 +7,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import service.abstr.BotUserService;
 import service.impl.BotUserServiceImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Bot extends TelegramLongPollingBot {
@@ -19,6 +24,7 @@ public class Bot extends TelegramLongPollingBot {
 
 
     BotUserService bus = BotUserServiceImpl.getInstance();
+
 
     public Bot(DefaultBotOptions options) {
         super(options);
@@ -50,6 +56,8 @@ public class Bot extends TelegramLongPollingBot {
             case "/listallusers":
 //                    bus.
                 break;
+
+
         }
 
 
@@ -61,8 +69,26 @@ public class Bot extends TelegramLongPollingBot {
 
     private void sendMsg(Message outMessage, String txtMessage) {
         SendMessage s = new SendMessage();
+
+        s.enableMarkdown(true);
+
+        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
+        s.setReplyMarkup(rkm);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow keyboardButtons = new KeyboardRow();
+        keyboardButtons.add("Регистрация");
+        keyboardButtons.add("Инфо");
+        keyboard.add(keyboardButtons);
+
+        rkm.setKeyboard(keyboard);
+        s.enableMarkdown(true);
+
+        keyboardButtons.removeAll(keyboard);
+
         s.setChatId(outMessage.getChatId());
         s.setText(txtMessage);
+
         try {
             execute(s);
         } catch (TelegramApiException e) {
