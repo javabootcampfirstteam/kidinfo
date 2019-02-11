@@ -56,7 +56,9 @@ public class Bot extends TelegramLongPollingBot {
             case "/listallusers":
 //                    bus.
                 break;
+            case "/removebuttons":
 
+                break;
 
         }
 
@@ -67,25 +69,33 @@ public class Bot extends TelegramLongPollingBot {
         return BOT_NAME;
     }
 
-    private void sendMsg(Message outMessage, String txtMessage) {
-        SendMessage s = new SendMessage();
 
-        s.enableMarkdown(true);
+    private void setButton() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
 
+    }
+
+
+    private void remButton() {
         ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
-        s.setReplyMarkup(rkm);
-
+        //        s.setReplyMarkup(rkm);
+//
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardButtons = new KeyboardRow();
-        keyboardButtons.add("Регистрация");
-        keyboardButtons.add("Инфо");
-        keyboard.add(keyboardButtons);
+//        keyboardButtons.add("Регистрация");
+//        keyboardButtons.add("Инфо");
+//        keyboard.add(keyboardButtons);
 
-        rkm.setKeyboard(keyboard);
-        s.enableMarkdown(true);
+//        rkm.setKeyboard(keyboard);
+//        s.enableMarkdown(true);
 
         keyboardButtons.removeAll(keyboard);
 
+    }
+
+    private void sendMsg(Message outMessage, String txtMessage) {
+        SendMessage s = new SendMessage();
         s.setChatId(outMessage.getChatId());
         s.setText(txtMessage);
 
