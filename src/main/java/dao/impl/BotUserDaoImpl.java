@@ -22,15 +22,15 @@ public class UserDaoImpl implements BotUserDao {
 
     @Override
     public BotUser getBotUserById(int id) {
-//        BotUser botUser = Storage,USERS_TABLE.getId();
-//        return botUser;
-    return null;
+        BotUser botUser = Storage.USERS_TABLE.get(id);
+        return botUser;
     }
 
     @Override
     public void addBotUser(int id, BotUser botUser) {
-//        Storage.USERS_TABLE.put(id,botUser)
+        Storage.USERS_TABLE.put(id,botUser);
     }
+
 
 
 }
