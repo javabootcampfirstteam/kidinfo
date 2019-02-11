@@ -1,1 +1,2 @@
 ﻿Print("Hello JavaBootCamp");
+Print("Hello JavaBootCamp");
