@@ -4,20 +4,20 @@ import dao.abstr.BotUserDao;
 import model.BotUser;
 import storage.Storage;
 
-public class UserDaoImpl implements BotUserDao {
+public class BotUserDaoImpl implements BotUserDao {
     //Поле класса, в котором хранится объект
-    private static UserDaoImpl instance;
+    private static BotUserDaoImpl instance;
 
-    public static UserDaoImpl getInstance() {
+    public static BotUserDaoImpl getInstance() {
         if (instance == null) {
-            instance = new UserDaoImpl();
+            instance = new BotUserDaoImpl();
         }
         return instance;
     }
 
 //pattern singlton
     //Приватный конструктор для того, чтоб его нельзя было вызвать извне
-    private UserDaoImpl() {
+    private BotUserDaoImpl() {
     }
 
     @Override
@@ -31,6 +31,8 @@ public class UserDaoImpl implements BotUserDao {
         Storage.USERS_TABLE.put(id,botUser);
     }
 
-
-
+    @Override
+    public BotUser[] getAllUsers() {
+        return null;
+    }
 }

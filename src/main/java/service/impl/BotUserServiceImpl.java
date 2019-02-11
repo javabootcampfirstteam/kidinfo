@@ -1,15 +1,18 @@
 package service.impl;
 
 import dao.abstr.BotUserDao;
-import dao.impl.UserDaoImpl;
+import dao.impl.BotUserDaoImpl;
 import model.BotUser;
 import service.abstr.BotUserService;
+import storage.Storage;
 
 public class BotUserServiceImpl implements BotUserService {
 
     private static BotUserServiceImpl instance;
 
     private BotUserServiceImpl() {
+
+
     }
 
     public static BotUserServiceImpl getInstance(){
@@ -19,23 +22,22 @@ public class BotUserServiceImpl implements BotUserService {
         return instance;
     }
 
-    private BotUserDao botUserDao = UserDaoImpl.getInstance();
+    private BotUserDao botUserDao = BotUserDaoImpl.getInstance();
 
     @Override
-    public void AddUser(Integer id, BotUser botUser) {
-//        Storage.USERS_TABLE.getId();
+    public void addUser(Integer id, BotUser botUser) {
+        botUserDao.addBotUser(id,botUser);
 
     }
 
     @Override
     public BotUser getUser(Integer id) {
-//        return Storage.USERS_TABLE.get(id);
-        return null;
+        return botUserDao.getBotUserById(id);
     }
 
     @Override
     public boolean isUserExistById(Integer id){
-    return botUserDao.getBotUserById(id) == null;
+    return botUserDao.getBotUserById(id) != null;
     }
 
 }

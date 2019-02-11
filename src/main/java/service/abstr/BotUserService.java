@@ -3,7 +3,7 @@ package service.abstr;
 import model.BotUser;
 
 public interface BotUserService {
-    void AddUser(Integer id, BotUser botUser);
+    void addUser(Integer id, BotUser botUser);
 
     BotUser getUser(Integer id);
     boolean isUserExistById(Integer id);

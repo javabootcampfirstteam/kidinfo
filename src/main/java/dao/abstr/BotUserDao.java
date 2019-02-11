@@ -7,4 +7,6 @@ public interface BotUserDao {
     BotUser getBotUserById(int id);
 
     void addBotUser(int id, BotUser botUser);
+
+    BotUser[] getAllUsers();
 }
