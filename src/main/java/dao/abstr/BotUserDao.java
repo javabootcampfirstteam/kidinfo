@@ -8,5 +8,8 @@ public interface BotUserDao {
 
     void addBotUser(int id, BotUser botUser);
 
+    void updateBotUser(int id, BotUser botUser);
+
+
     BotUser[] getAllUsers();
 }

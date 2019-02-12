@@ -20,8 +20,8 @@ import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private static String BOT_NAME=BotOptions.BOT_NAME;
-    private static String BOT_TOKEN=BotOptions.BOT_TOKEN;
+    private static String BOT_NAME = BotOptions.BOT_NAME;
+    private static String BOT_TOKEN = BotOptions.BOT_TOKEN;
 
 
     BotUserService botUserService = BotUserServiceImpl.getInstance();
@@ -45,15 +45,21 @@ public class Bot extends TelegramLongPollingBot {
             Integer currentUserId = userFromTelegram.getId();
             Long currentChatId = message.getChatId();
 
+            //Если юзером вводится команда /start
             if ("/start".equals(messageFromTelegram)) {
+
                 if (!botUserService.isUserExistById(currentUserId)) {
+                    //Пользователя нет в базе
+                    sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
                     botUserService.addUser(currentUserId, new BotUser(telegramUserName));
                     sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
-                } else {
-                    sendMsg(currentChatId, "Привет " + telegramUserName + ", Мы уже знакомы с вами!");
+                } else
+//                    пользователь есть в базе
+                {
+                    sendMsg(currentChatId, "Привет " + botUserService.getUser(currentUserId).getName() + ", Мы уже знакомы с вами!");
                 }
-                sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
 
+//Пользователь вводит отличное от /start
             } else {
 
                 BotUser currentUser = botUserService.getUser(currentUserId);
@@ -66,6 +72,7 @@ public class Bot extends TelegramLongPollingBot {
                             sendMsg(currentChatId, "регстрация");
                             sendMsg(currentChatId, "Введитте имя");
                             setContextToUser(currentUserId, "/reg");
+
                             break;
                         }
                         case "/info": {
@@ -85,7 +92,8 @@ public class Bot extends TelegramLongPollingBot {
                         case "/reg": {
 
                             if (currentContext.size() == contextPosition) {
-                                //ДОБАВЛЕНИЕ  ИМЕНИ
+                                currentUser.name=messageFromTelegram;
+                                botUserService.addUser(currentUserId,currentUser);
                             } else {
                                 switch (currentContext.get(contextPosition++)) {
 

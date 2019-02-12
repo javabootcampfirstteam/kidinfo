@@ -8,8 +8,3 @@ public enum  Context {
 
 
     }
-class Test{
-    public static void main(String[] args) {
-//        System.out.println(Context.valueOf();
-    }
-}

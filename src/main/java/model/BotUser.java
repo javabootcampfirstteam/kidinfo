@@ -5,11 +5,18 @@ import java.util.List;
 
 public class BotUser {
 
-    private String name;
 
-    public BotUser(String name) {
-        this.name = name;
+    public String telegramName;
+    public String name;
+    public String surname;
+
+
+
+
+    public BotUser(String telegramName) {
+        this.telegramName = telegramName;
     }
+
 
 
     private List<String> context = new ArrayList<>();
@@ -18,9 +25,6 @@ public class BotUser {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public List<String> getContext() {
         return context;
