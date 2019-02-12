@@ -49,40 +49,71 @@ public class Bot extends TelegramLongPollingBot {
                 sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
                 sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
 
-            } else {
+            } else  {
+
+
+
 
 
                 BotUser currentUser = botUserService.getUser(currentUserId);
                 List<String> currentContext = currentUser.getContext();
 
-                int contextPosition = 0;
 
 
-                switch (currentContext.get(contextPosition)){
-                    case "/reg" :{
+                if (currentContext.isEmpty()){
 
-                        if (currentContext.size() == ++contextPosition){
+                    switch (messageFromTelegram){
+                        case "/reg" :{
                             sendMsg(currentChatId, "регстрация");
-
-                        } else {
-
+                            sendMsg(currentChatId, "Введитте имя");
+                            setContextToUser(currentUserId,"/reg");
+                            break;
                         }
-                        break;
-                    }
-                    case "/info" :{
-                        sendMsg(currentChatId, "информация");
-                        break;
-                    }
-                    case "/list_activities" :{
-                        // проверка роли
-                        sendMsg(currentChatId, "список");
-                        break;
+                        case "/info" :{
+                            sendMsg(currentChatId, "информация");
+                            setContextToUser(currentUserId,"/info");
+                            break;
+                        }
+                        default:{
+                            sendMsg(currentChatId,"неизвестная команда");
+                        }
                     }
 
-                    default:{
-                        sendMsg(currentChatId,"неизвестная команда");
+
+
+                } else {
+                    int contextPosition = 0;
+                    switch (currentContext.get(contextPosition++)){
+                        case "/reg" :{
+
+                            if (currentContext.size() == contextPosition){
+                                //ДОБАВЛЕНИЕ  ИМЕНИ
+                            } else {
+                                switch (currentContext.get(contextPosition++)){
+
+                                }
+                            }
+                            break;
+                        }
+                        case "/info" :{
+
+
+
+                            break;
+                        }
+                        case "/list_activities" :{
+                            // проверка роли
+                            sendMsg(currentChatId, "список");
+                            break;
+                        }
+
+                        default:{
+                            sendMsg(currentChatId,"неизвестная команда");
+                        }
                     }
                 }
+
+
 
             }
 
