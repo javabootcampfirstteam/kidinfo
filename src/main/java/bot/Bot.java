@@ -44,86 +44,73 @@ public class Bot extends TelegramLongPollingBot {
             Integer currentUserId = userFromTelegram.getId();
             Long currentChatId = message.getChatId();
 
-            if ("/start".equals(messageFromTelegram)){
-                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
-                sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
+            if ("/start".equals(messageFromTelegram)) {
+                if (!botUserService.isUserExistById(currentUserId)) {
+                    botUserService.addUser(currentUserId, new BotUser(telegramUserName));
+                    sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
+                } else {
+                    sendMsg(currentChatId, "Привет " + telegramUserName + ", Мы уже знакомы с вами!");
+                }
                 sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
 
-            } else  {
-
-
-
-
+            } else {
 
                 BotUser currentUser = botUserService.getUser(currentUserId);
                 List<String> currentContext = currentUser.getContext();
 
+                if (currentContext.isEmpty()) {
 
-
-                if (currentContext.isEmpty()){
-
-                    switch (messageFromTelegram){
-                        case "/reg" :{
+                    switch (messageFromTelegram) {
+                        case "/reg": {
                             sendMsg(currentChatId, "регстрация");
                             sendMsg(currentChatId, "Введитте имя");
-                            setContextToUser(currentUserId,"/reg");
+                            setContextToUser(currentUserId, "/reg");
                             break;
                         }
-                        case "/info" :{
+                        case "/info": {
                             sendMsg(currentChatId, "информация");
-                            setContextToUser(currentUserId,"/info");
+                            setContextToUser(currentUserId, "/info");
                             break;
                         }
-                        default:{
-                            sendMsg(currentChatId,"неизвестная команда");
+                        default: {
+                            sendMsg(currentChatId, "неизвестная команда");
                         }
                     }
 
 
-
                 } else {
                     int contextPosition = 0;
-                    switch (currentContext.get(contextPosition++)){
-                        case "/reg" :{
+                    switch (currentContext.get(contextPosition++)) {
+                        case "/reg": {
 
-                            if (currentContext.size() == contextPosition){
+                            if (currentContext.size() == contextPosition) {
                                 //ДОБАВЛЕНИЕ  ИМЕНИ
                             } else {
-                                switch (currentContext.get(contextPosition++)){
+                                switch (currentContext.get(contextPosition++)) {
 
                                 }
                             }
                             break;
                         }
-                        case "/info" :{
-
+                        case "/info": {
 
 
                             break;
                         }
-                        case "/list_activities" :{
+                        case "/list_activities": {
                             // проверка роли
                             sendMsg(currentChatId, "список");
                             break;
                         }
 
-                        default:{
-                            sendMsg(currentChatId,"неизвестная команда");
+                        default: {
+                            sendMsg(currentChatId, "неизвестная команда");
                         }
                     }
                 }
 
 
-
             }
-
-
-
-
-
-
-
-
 
 
         }
@@ -150,12 +137,12 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 
-    private void setContextToUser(Integer userId, String context){
+    private void setContextToUser(Integer userId, String context) {
         BotUser currentUser = botUserService.getUser(userId);
         currentUser.getContext().add(context);
     }
 
-    private void removeLastContextElement(Integer userId){
+    private void removeLastContextElement(Integer userId) {
         BotUser currentUser = botUserService.getUser(userId);
         currentUser.getContext().remove(currentUser.getContext().size());
     }
