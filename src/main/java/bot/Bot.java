@@ -20,11 +20,8 @@ import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
-//    private static String BOT_NAME = "KininfoTelegramBot";
-//    private static String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
-
-    private static String BOT_NAME=BotOptions.getName();
-    private static String BOT_TOKEN=BotOptions.getToken();
+    private static String BOT_NAME=BotOptions.BOT_NAME;
+    private static String BOT_TOKEN=BotOptions.BOT_TOKEN;
 
 
     BotUserService botUserService = BotUserServiceImpl.getInstance();
