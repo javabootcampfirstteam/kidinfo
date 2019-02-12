@@ -5,7 +5,6 @@ import model.BotUser;
 import storage.Storage;
 
 public class BotUserDaoImpl implements BotUserDao {
-    //Поле класса, в котором хранится объект
     private static BotUserDaoImpl instance;
 
     public static BotUserDaoImpl getInstance() {
@@ -15,8 +14,6 @@ public class BotUserDaoImpl implements BotUserDao {
         return instance;
     }
 
-//pattern singlton
-    //Приватный конструктор для того, чтоб его нельзя было вызвать извне
     private BotUserDaoImpl() {
     }
 

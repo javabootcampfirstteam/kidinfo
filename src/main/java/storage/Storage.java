@@ -7,6 +7,5 @@ import java.util.Map;
 
 public class Storage {
 
-    public static Map<Integer, BotUser> USERS_TABLE = new HashMap<Integer, BotUser>();
-    
+    public static Map<Integer, BotUser> USERS_TABLE = new HashMap<>();
 }

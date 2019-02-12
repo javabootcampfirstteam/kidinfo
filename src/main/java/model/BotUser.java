@@ -12,8 +12,21 @@ public class BotUser {
     }
 
 
-//    List<String> context = ArrayList<String>();
+    private List<String> context = new ArrayList<>();
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public List<String> getContext() {
+        return context;
+    }
+
+    public void setContext(List<String> context) {
+        this.context = context;
+    }
 }

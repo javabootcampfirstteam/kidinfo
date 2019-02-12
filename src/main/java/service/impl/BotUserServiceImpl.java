@@ -12,15 +12,8 @@ import java.util.List;
 public class BotUserServiceImpl implements BotUserService {
 
     private static BotUserServiceImpl instance;
-    private List<String> context = new ArrayList<String>();
 
-    public String getContext(){
-        return null;
-    }
 
-    public void setContext(String context){
-        this.context.add(context);
-    }
 
     private BotUserServiceImpl() {
     }

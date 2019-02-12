@@ -23,8 +23,6 @@ public class Bot extends TelegramLongPollingBot {
     private static String BOT_NAME = "KininfoTelegramBot";
     private static String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 
-
-    //Создаем экземпляр класса для UserService
     BotUserService botUserService = BotUserServiceImpl.getInstance();
 
     public Bot(DefaultBotOptions options) {
@@ -40,36 +38,63 @@ public class Bot extends TelegramLongPollingBot {
         Message message = update.getMessage();
 
         if (message != null & message.hasText()) {
-            String textMessage = message.getText();
-            User user = message.getFrom();
-            String userName = user.getFirstName();
-            Integer id = user.getId();
+            String messageFromTelegram = message.getText();
+            User userFromTelegram = message.getFrom();
+            String telegramUserName = userFromTelegram.getFirstName();
+            Integer currentUserId = userFromTelegram.getId();
+            Long currentChatId = message.getChatId();
 
-            botUserService.setContext(textMessage);
+            if ("/start".equals(messageFromTelegram)){
+                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
+                sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
+                sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
 
-            switch (textMessage) {
-                case "/start":
-                    if (!botUserService.isUserExistById(id)) {
-                        botUserService.addUser(id, new BotUser(userName));
-                        sendMsg(message, "Привет " + userName + ", вы впервые у нас, добавляем вас в базу");
-//                        setButton(message);
-                    } else {
-                        sendMsg(message, "Привет " + userName + ", я тебя знаю.");
+            } else {
+
+
+                BotUser currentUser = botUserService.getUser(currentUserId);
+                List<String> currentContext = currentUser.getContext();
+
+                int contextPosition = 0;
+
+
+                switch (currentContext.get(contextPosition)){
+                    case "/reg" :{
+
+                        if (currentContext.size() == ++contextPosition){
+                            sendMsg(currentChatId, "регстрация");
+
+                        } else {
+
+                        }
+                        break;
+                    }
+                    case "/info" :{
+                        sendMsg(currentChatId, "информация");
+                        break;
+                    }
+                    case "/list_activities" :{
+                        // проверка роли
+                        sendMsg(currentChatId, "список");
+                        break;
                     }
 
-                    break;
-                case "/info":
-//                    sendMsg(message,"Информация");
-                    break;
-                case "/reg":
-//                    sendMsg(message,"Регистрация");
+                    default:{
+                        sendMsg(currentChatId,"неизвестная команда");
+                    }
+                }
 
-                    break;
-
-                case "/pwd":
-                    sendMsg(message,botUserService.getContext());
-                    break;
             }
+
+
+
+
+
+
+
+
+
+
         }
 
     }
@@ -94,10 +119,20 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 
-    private void sendMsg(Message message, String txtMessage) {
+    private void setContextToUser(Integer userId, String context){
+        BotUser currentUser = botUserService.getUser(userId);
+        currentUser.getContext().add(context);
+    }
+
+    private void removeLastContextElement(Integer userId){
+        BotUser currentUser = botUserService.getUser(userId);
+        currentUser.getContext().remove(currentUser.getContext().size());
+    }
+
+
+    private void sendMsg(Long chatId, String txtMessage) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(message.getChatId());
-//        sendMessage.setReplyToMessageId(message.getMessageId());
+        sendMessage.setChatId(chatId);
         sendMessage.setText(txtMessage);
 
         try {
