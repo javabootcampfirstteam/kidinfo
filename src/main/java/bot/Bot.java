@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import service.abstr.BotUserService;
@@ -23,8 +24,8 @@ public class Bot extends TelegramLongPollingBot {
     private static String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 
 
-    BotUserService bus = BotUserServiceImpl.getInstance();
-
+    //Создаем экземпляр класса для UserService
+    BotUserService botUserService = BotUserServiceImpl.getInstance();
 
     public Bot(DefaultBotOptions options) {
         super(options);
@@ -37,31 +38,39 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         Message message = update.getMessage();
-        String textMessage = message.getText();
-        User user = message.getFrom();
-        String userName = user.getFirstName();
-        Integer id = user.getId();
 
-        switch (textMessage) {
-            case "/start":
-                if (!bus.isUserExistById(id)) {
-                    bus.addUser(id, new BotUser(userName));
-                    sendMsg(message, "Привет " + userName + ", вы впервые у нас, добавляем вас в базу");
+        if (message != null & message.hasText()) {
+            String textMessage = message.getText();
+            User user = message.getFrom();
+            String userName = user.getFirstName();
+            Integer id = user.getId();
 
-                } else {
-                    sendMsg(message, "Привет " + userName + ", я тебя знаю.");
-                }
+            botUserService.setContext(textMessage);
 
-                break;
-            case "/listallusers":
-//                    bus.
-                break;
-            case "/removebuttons":
+            switch (textMessage) {
+                case "/start":
+                    if (!botUserService.isUserExistById(id)) {
+                        botUserService.addUser(id, new BotUser(userName));
+                        sendMsg(message, "Привет " + userName + ", вы впервые у нас, добавляем вас в базу");
+//                        setButton(message);
+                    } else {
+                        sendMsg(message, "Привет " + userName + ", я тебя знаю.");
+                    }
 
-                break;
+                    break;
+                case "/info":
+//                    sendMsg(message,"Информация");
+                    break;
+                case "/reg":
+//                    sendMsg(message,"Регистрация");
 
+                    break;
+
+                case "/pwd":
+                    sendMsg(message,botUserService.getContext());
+                    break;
+            }
         }
-
 
     }
 
@@ -69,38 +78,31 @@ public class Bot extends TelegramLongPollingBot {
         return BOT_NAME;
     }
 
-
-    private void setButton() {
+    public void setButton(SendMessage sendMessage) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> keyboard = new ArrayList<>();
-
+        KeyboardRow keyboardRow = new KeyboardRow();
+        keyboardRow.add(new KeyboardButton("/reg"));
+        keyboardRow.add(new KeyboardButton("/info"));
+        keyboardRow.add(new KeyboardButton("/start"));
+        keyboard.add(keyboardRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
     }
 
 
-    private void remButton() {
-        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
-        //        s.setReplyMarkup(rkm);
-//
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow keyboardButtons = new KeyboardRow();
-//        keyboardButtons.add("Регистрация");
-//        keyboardButtons.add("Инфо");
-//        keyboard.add(keyboardButtons);
-
-//        rkm.setKeyboard(keyboard);
-//        s.enableMarkdown(true);
-
-        keyboardButtons.removeAll(keyboard);
-
-    }
-
-    private void sendMsg(Message outMessage, String txtMessage) {
-        SendMessage s = new SendMessage();
-        s.setChatId(outMessage.getChatId());
-        s.setText(txtMessage);
+    private void sendMsg(Message message, String txtMessage) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(message.getChatId());
+//        sendMessage.setReplyToMessageId(message.getMessageId());
+        sendMessage.setText(txtMessage);
 
         try {
-            execute(s);
+//            setButton(sendMessage);
+            execute(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BotUser {
 
     private String name;
@@ -9,6 +12,7 @@ public class BotUser {
     }
 
 
+//    List<String> context = ArrayList<String>();
 
 
 
