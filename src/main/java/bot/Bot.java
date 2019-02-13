@@ -69,7 +69,7 @@ public class Bot extends TelegramLongPollingBot {
 
                     switch (messageFromTelegram) {
                         case "/reg": {
-                            sendMsg(currentChatId, "регстрация");
+                            sendMsg(currentChatId, "Регистрация");
                             sendMsg(currentChatId, "Введитте имя");
                             setContextToUser(currentUserId, "/reg");
 
@@ -90,13 +90,26 @@ public class Bot extends TelegramLongPollingBot {
                     int contextPosition = 0;
                     switch (currentContext.get(contextPosition++)) {
                         case "/reg": {
-
                             if (currentContext.size() == contextPosition) {
-                                currentUser.name=messageFromTelegram;
-                                botUserService.addUser(currentUserId,currentUser);
+                                currentUser.setName(messageFromTelegram);
+                                sendMsg(currentChatId, "Введите фамилию");
+                                setContextToUser(currentUserId, "/surname");
                             } else {
-                                switch (currentContext.get(contextPosition++)) {
-
+                                switch (currentContext.get(contextPosition++)){
+                                    case "/surname":
+                                        if (currentContext.size() == contextPosition) {
+                                            currentUser.setSurname(messageFromTelegram);
+                                            sendMsg(currentChatId, "Ваш район проживания");
+                                            setContextToUser(currentUserId, "/location");
+                                        } else {
+                                            switch (currentContext.get(contextPosition++)){
+                                                case "/location":
+                                                    currentUser.setSurname(messageFromTelegram);
+                                                    sendMsg(currentChatId, "Регистрация окончена");
+                                                    break;
+                                            }
+                                        }
+                                        break;
                                 }
                             }
                             break;

@@ -6,31 +6,39 @@ import java.util.List;
 public class BotUser {
 
 
-    public String telegramName;
-    public String name;
-    public String surname;
-
-
-
+    private String telegramName;
+    private String name;
+    private String surname;
+    private String location;
 
     public BotUser(String telegramName) {
         this.telegramName = telegramName;
     }
 
-
-
-    private List<String> context = new ArrayList<>();
-
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    private List<String> context = new ArrayList<>();
 
     public List<String> getContext() {
         return context;
     }
 
-    public void setContext(List<String> context) {
-        this.context = context;
-    }
 }
