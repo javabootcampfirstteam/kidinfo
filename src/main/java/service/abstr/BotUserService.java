@@ -8,5 +8,4 @@ public interface BotUserService {
     BotUser getUser(Integer id);
     boolean isUserExistById(Integer id);
 
-//    void updateUser(Integer id, BotUser botUser);
 }
