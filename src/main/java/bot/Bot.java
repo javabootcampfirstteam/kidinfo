@@ -27,13 +27,21 @@ public class Bot extends TelegramLongPollingBot {
     String userFirstName;
 
 
+    //
+
+
+
+
+
+    
+
     //Misha
 //    private static final String BOT_NAME = "KininfoTelegramBot";
 //    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 
     //Stas
-//    private static final String BOT_NAME = “cas_to_everyone_bot”;
-//    private static final String BOT_TOKEN = “666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc”;
+    private static final String BOT_NAME = "cas_to_everyone_bot";
+    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
 
     //Yuri
 //    private static final String BOT_NAME = “cas_to_everyone_bot”;
