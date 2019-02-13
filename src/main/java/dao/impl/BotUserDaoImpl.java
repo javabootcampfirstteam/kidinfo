@@ -32,9 +32,5 @@ public class BotUserDaoImpl implements BotUserDao {
     public BotUser[] getAllUsers() {
         return null;
     }
-
-    @Override
-    public void updateBotUser(int id, BotUser botUser) {
-        Storage.USERS_TABLE.entrySet();
-    }
+    
 }
