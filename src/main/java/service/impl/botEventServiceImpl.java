@@ -13,8 +13,8 @@ public class botEventServiceImpl implements BotEventService {
     private botEventServiceImpl() {
     }
 
-    public static botEventServiceImpl getInstance(){
-        if(instance==null){
+    public static botEventServiceImpl getInstance() {
+        if (instance == null) {
             instance = new botEventServiceImpl();
         }
         return instance;
@@ -33,7 +33,12 @@ public class botEventServiceImpl implements BotEventService {
     }
 
     @Override
-    public boolean isUserExistById(Integer id) {
+    public boolean isEventExistById(Integer id) {
         return botEventDao.getBotEventById(id) != null;
-        }
+    }
+
+    @Override
+    public boolean isEventExists() {
+        return botEventDao.countEvents() > 0;
+    }
 }
