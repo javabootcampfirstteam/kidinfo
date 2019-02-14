@@ -85,14 +85,14 @@ public class Bot extends TelegramLongPollingBot {
 
                 if (!botUserService.isUserExistById(currentUserId)) {
                     //Пользователя нет в базе
-                    sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
+//                    sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
                     sendMsg(currentChatId, "/reg - регистрация\n/info - информация\n/addevent - Добавить событие");
                     botUserService.addUser(currentUserId, new BotUser(telegramUserName));
-                } else
+                } //else
 //                    пользователь есть в базе
-                {
-                    sendMsg(currentChatId, "Привет " + botUserService.getUser(currentUserId).getName() + ", Мы уже знакомы с вами!");
-                }
+//                {
+//                    sendMsg(currentChatId, "Привет " + botUserService.getUser(currentUserId).getName() + ", Мы уже знакомы с вами!");
+//                }
 
 //Пользователь вводит отличное от /start
             } else {
@@ -190,8 +190,6 @@ public class Bot extends TelegramLongPollingBot {
                                                                     botEventService.addEvent(botEvent);
                                                                     sendMsg(currentChatId, "Событие добавлено!\n/reg - регистрация\n/info - информация\n/addevent - Добавить событие");
                                                                     currentContext.clear();
-//                                                                    System.out.println("sss");
-//                                                                    setContextToUser(currentUserId, "/start");
                                                                 }
                                                         }
                                                     }
