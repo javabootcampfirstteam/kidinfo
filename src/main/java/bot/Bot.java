@@ -1,5 +1,6 @@
 package bot;
 
+import model.BotEvent;
 import model.BotUser;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -8,22 +9,38 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import service.abstr.BotEventService;
 import service.abstr.BotUserService;
 import service.impl.botEventServiceImpl;
 import service.impl.botUserServiceImpl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
+
+
+    //Переменные для модели события
+    String eventName;
+    String eventType;
+    LocalDateTime eventDateTime;
+    String eventLocation;
+    String eventContact;
+    String eventPhone;
+    String eventAdditional;
+    int eventOwner;
 
 
     private Long currentChatId;
     private Integer currentUserId;
     private String telegramUserName;
     String lastMessage = "";
-    ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(); // create keyboard
+
+
     String telegramUserFirstName;
     int contextPosition = 0;
 
@@ -55,6 +72,7 @@ public class Bot extends TelegramLongPollingBot {
 
         Message message = update.getMessage();
 
+
         if (message != null & message.hasText()) {
             String messageFromTelegram = message.getText();
             User userFromTelegram = message.getFrom();
@@ -67,9 +85,9 @@ public class Bot extends TelegramLongPollingBot {
 
                 if (!botUserService.isUserExistById(currentUserId)) {
                     //Пользователя нет в базе
-                    sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
-                    botUserService.addUser(currentUserId, new BotUser(telegramUserName));
                     sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
+                    sendMsg(currentChatId, "/reg - регистрация\n/info - информация\n/addevent - Добавить событие");
+                    botUserService.addUser(currentUserId, new BotUser(telegramUserName));
                 } else
 //                    пользователь есть в базе
                 {
@@ -81,31 +99,38 @@ public class Bot extends TelegramLongPollingBot {
 
                 BotUser currentUser = botUserService.getUser(currentUserId);
                 List<String> currentContext = currentUser.getContext();
-
+//Если контекст пустой
                 if (currentContext.isEmpty()) {
 
                     switch (messageFromTelegram) {
                         case "/reg": {
-                            sendMsg(currentChatId, "Регистрация");
-                            sendMsg(currentChatId, "Введитте имя");
+                            sendMsg(currentChatId, "Регистрация\nВведите имя");
                             setContextToUser(currentUserId, "/reg");
 
                             break;
                         }
                         case "/info": {
-                            sendMsg(currentChatId, "информация");
+                            sendMsg(currentChatId, "Информация");
                             setContextToUser(currentUserId, "/info");
                             break;
                         }
+
+                        case "/addevent":
+                            sendMsg(currentChatId, "Добавить событие\nВведите название события");
+                            setContextToUser(currentUserId, messageFromTelegram);
+//                            System.out.println("w");
+                            break;
+
                         default: {
-                            sendMsg(currentChatId, "неизвестная команда");
+                            sendMsg(currentChatId, "Неизвестная команда");
                         }
                     }
 
-
+//Здесь уже будет непосрдественно обрабаотываться вложенность контекста и добавяление данных в базу.
                 } else {
                     int contextPosition = 0;
                     switch (currentContext.get(contextPosition++)) {
+//                        Основной процесс регистрации
                         case "/reg": {
                             if (currentContext.size() == contextPosition) {
                                 currentUser.setName(messageFromTelegram);
@@ -123,6 +148,7 @@ public class Bot extends TelegramLongPollingBot {
                                                 case "/location":
                                                     currentUser.setLocation(messageFromTelegram);
                                                     sendMsg(currentChatId, "Регистрация окончена");
+                                                    currentContext.clear();
                                                     break;
                                             }
                                         }
@@ -131,6 +157,48 @@ public class Bot extends TelegramLongPollingBot {
                             }
                             break;
                         }
+//Основной процесс добавления ивента
+                        case "/addevent":
+                            if (currentContext.size() == contextPosition) {
+                                eventName = messageFromTelegram;
+                                setContextToUser(currentUserId, "/addeventtype");
+                                String[] buttons = {"Мастер-класс", "Соревнование"};
+                                createButtons(message, buttons, "Тип события:");
+                            } else {
+                                switch (currentContext.get(contextPosition++)) {
+                                    case "/addeventtype":
+                                        if (currentContext.size() == contextPosition) {
+                                            eventType = messageFromTelegram;
+                                            sendMsg(currentChatId, "Дата мероприятия в формате ДД.ММ.ГГ ЧЧ:ММ");
+                                            setContextToUser(currentUserId, "/eventdate");
+                                        } else {
+                                            switch (currentContext.get(contextPosition++)) {
+                                                case "/eventdate":
+                                                    if (currentContext.size() == contextPosition) {
+                                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
+                                                        eventDateTime = LocalDateTime.parse(messageFromTelegram, formatter);
+                                                        sendMsg(currentChatId, "Контакт администратора");
+                                                        setContextToUser(currentUserId, "/eventcontact");
+                                                    } else {
+                                                        switch (currentContext.get(contextPosition++)) {
+                                                            case "/eventcontact":
+                                                                if (currentContext.size() == contextPosition) {
+                                                                    eventContact = messageFromTelegram;
+                                                                    BotEvent botEvent = new BotEvent(eventName, eventType, eventDateTime, eventContact);
+                                                                    botEventService.addEvent(botEvent);
+                                                                    sendMsg(currentChatId, "Событие добавлено!\n/reg - регистрация\n/info - информация\n/addevent - Добавить событие");
+                                                                    currentContext.clear();
+//                                                                    System.out.println("sss");
+//                                                                    setContextToUser(currentUserId, "/start");
+                                                                }
+                                                        }
+                                                    }
+                                            }
+                                        }
+                                }
+                            }
+                            break;
+
                         case "/info": {
 
 
@@ -176,11 +244,66 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setChatId(chatId);
         sendMessage.setText(txtMessage);
 
+
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
+
+    private void createButtons(Message message, String[] buttons, String textMessage) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+
+        // Создаем клавиуатуру
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        // Создаем список строк клавиатуры
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        // Первая строчка клавиатуры
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        // Добавляем кнопки в первую строчку клавиатуры
+        for (String i : buttons) {
+            keyboardFirstRow.add(i);
+        }
+        // Вторая строчка клавиатуры
+//        KeyboardRow keyboardSecondRow = new KeyboardRow();
+        // Добавляем кнопки во вторую строчку клавиатуры
+//        keyboardSecondRow.add("Команда 3");
+//        keyboardSecondRow.add("Команда 4");
+
+        // Добавляем все строчки клавиатуры в список
+        keyboard.add(keyboardFirstRow);
+//        keyboard.add(keyboardSecondRow);
+        // и устанваливаем этот список нашей клавиатуре
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
+        sendMessage.setChatId(message.getChatId().toString());
+        sendMessage.setText(textMessage);
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /*private void initKeyboard(ArrayList<KeyboardRow> keyboard, KeyboardRow keyboardFirstRow, KeyboardRow keyboardSecondRow) {
+        keyboard.clear();
+        keyboardFirstRow.clear();
+        keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
+        keyboardFirstRow.add("Регион оповещения");
+        keyboardSecondRow.add("Главное Меню⬆️");
+        keyboard.add(keyboardFirstRow);
+        keyboard.add(keyboardSecondRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+    }*/
 
 }
