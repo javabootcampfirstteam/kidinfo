@@ -10,6 +10,11 @@ public class BotUser {
     private String name;
     private String surname;
     private String location;
+    private String role;
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public BotUser(String telegramName) {
         this.telegramName = telegramName;

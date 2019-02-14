@@ -141,12 +141,14 @@ public class Bot extends TelegramLongPollingBot {
                                     case "/surname":
                                         if (currentContext.size() == contextPosition) {
                                             currentUser.setSurname(messageFromTelegram);
-                                            sendMsg(currentChatId, "Ваш район проживания");
-                                            setContextToUser(currentUserId, "/location");
+                                            sendMsg(currentChatId, "Ваша роль");
+                                            setContextToUser(currentUserId, "/role");
+                                            String[] role = {"Админ","Ребенок","Родитель"};
+                                            createButtons(message, role, "Ваша роль");
                                         } else {
                                             switch (currentContext.get(contextPosition++)) {
-                                                case "/location":
-                                                    currentUser.setLocation(messageFromTelegram);
+                                                case "/role":
+                                                    currentUser.setRole(messageFromTelegram);
                                                     sendMsg(currentChatId, "Регистрация окончена");
                                                     currentContext.clear();
                                                     break;
@@ -162,8 +164,8 @@ public class Bot extends TelegramLongPollingBot {
                             if (currentContext.size() == contextPosition) {
                                 eventName = messageFromTelegram;
                                 setContextToUser(currentUserId, "/addeventtype");
-                                String[] buttons = {"Мастер-класс", "Соревнование"};
-                                createButtons(message, buttons, "Тип события:");
+                                String[] eventType = {"Мастер-класс", "Соревнование"};
+                                createButtons(message, eventType, "Тип события:");
                             } else {
                                 switch (currentContext.get(contextPosition++)) {
                                     case "/addeventtype":
