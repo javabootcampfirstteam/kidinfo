@@ -8,17 +8,13 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import service.abstr.BotEventService;
 import service.abstr.BotUserService;
 import service.impl.botEventServiceImpl;
 import service.impl.botUserServiceImpl;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class Bot extends TelegramLongPollingBot {
 
@@ -32,13 +28,11 @@ public class Bot extends TelegramLongPollingBot {
     int contextPosition = 0;
 
     //Misha
-//    private static final String BOT_NAME = "KininfoTelegramBot";
-//    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
-
+    private static final String BOT_NAME = "KininfoTelegramBot";
+    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
     //Stas
 //    private static final String BOT_NAME = "cas_to_everyone_bot";
 //    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
-
     //Yuri
 //    private static final String BOT_NAME = "balabbolBot";
 //    private static final String BOT_TOKEN = "788017408:AAGhd7up3I-F2WhBBD60JXHGAXSn8xDLZ6w";
@@ -51,78 +45,115 @@ public class Bot extends TelegramLongPollingBot {
         super(options);
     }
 
+
     public String getBotToken() {
         return BOT_TOKEN;
     }
 
 
     public void onUpdateReceived(Update update) {
-        String eventName;
-        String eventType;
-        LocalDateTime eventDateTime;
-        String eventLocation;
-        String eventContact;
-        String eventPhone;
-        String eventAdditional;
-        int eventOwner;
 
-        //Получаем сообщение из апдейта
         Message message = update.getMessage();
+
         if (message != null & message.hasText()) {
-            //Получаем текст сообщения
             String messageFromTelegram = message.getText();
-            //Получаем телеграмовского юзера
             User userFromTelegram = message.getFrom();
-            //Получаем Имя юзера из телеграма
-            telegramUserFirstName = userFromTelegram.getFirstName();
-            //Поучаем текущий userId
-            currentUserId = userFromTelegram.getId();
-            //Получаем текущий chatId
-            currentChatId = message.getChatId();
-            String currenMessage = null;
+            String telegramUserName = userFromTelegram.getFirstName();
+            Integer currentUserId = userFromTelegram.getId();
+            Long currentChatId = message.getChatId();
 
+            //Если юзером вводится команда /start
+            if ("/start".equals(messageFromTelegram)) {
 
-            if (!botUserService.isUserExistById(currentUserId)) {
-                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
-            }
-
-            BotUser currentUser = botUserService.getUser(currentUserId);
-
-            List<String> currentContext = currentUser.getContext();
-
-            if (!currentContext.isEmpty()) {
-
-                switch (currentContext.get(contextPosition)) {
-                    case "regEvent":
-//                        if (currentContext.size() == contextPosition) {
-                        eventLocation = messageFromTelegram;
-                        setContextToUser(currentUserId, "nameEvent");
-                        currenMessage = "Введите название мероприятия";
-                        contextPosition++;
-//                        }
-                        break;
-                    case "nameEvent":
-                        eventName = messageFromTelegram;
-
-                        break;
-
-                    case "regionOfAlert":
-                        currentUser.setLocation(messageFromTelegram);
+                if (!botUserService.isUserExistById(currentUserId)) {
+                    //Пользователя нет в базе
+                    sendMsg(currentChatId, "/reg - регистрация\n/info - информация");
+                    botUserService.addUser(currentUserId, new BotUser(telegramUserName));
+                    sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
+                } else
+//                    пользователь есть в базе
+                {
+                    sendMsg(currentChatId, "Привет " + botUserService.getUser(currentUserId).getName() + ", Мы уже знакомы с вами!");
                 }
+
+//Пользователь вводит отличное от /start
+            } else {
+
+                BotUser currentUser = botUserService.getUser(currentUserId);
+                List<String> currentContext = currentUser.getContext();
+
+                if (currentContext.isEmpty()) {
+
+                    switch (messageFromTelegram) {
+                        case "/reg": {
+                            sendMsg(currentChatId, "Регистрация");
+                            sendMsg(currentChatId, "Введитте имя");
+                            setContextToUser(currentUserId, "/reg");
+
+                            break;
+                        }
+                        case "/info": {
+                            sendMsg(currentChatId, "информация");
+                            setContextToUser(currentUserId, "/info");
+                            break;
+                        }
+                        default: {
+                            sendMsg(currentChatId, "неизвестная команда");
+                        }
+                    }
+
+
+                } else {
+                    int contextPosition = 0;
+                    switch (currentContext.get(contextPosition++)) {
+                        case "/reg": {
+                            if (currentContext.size() == contextPosition) {
+                                currentUser.setName(messageFromTelegram);
+                                sendMsg(currentChatId, "Введите фамилию");
+                                setContextToUser(currentUserId, "/surname");
+                            } else {
+                                switch (currentContext.get(contextPosition++)) {
+                                    case "/surname":
+                                        if (currentContext.size() == contextPosition) {
+                                            currentUser.setSurname(messageFromTelegram);
+                                            sendMsg(currentChatId, "Ваш район проживания");
+                                            setContextToUser(currentUserId, "/location");
+                                        } else {
+                                            switch (currentContext.get(contextPosition++)) {
+                                                case "/location":
+                                                    currentUser.setLocation(messageFromTelegram);
+                                                    sendMsg(currentChatId, "Регистрация окончена");
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                }
+                            }
+                            break;
+                        }
+                        case "/info": {
+
+
+                            break;
+                        }
+                        case "/list_activities": {
+                            // проверка роли
+                            sendMsg(currentChatId, "список");
+                            break;
+                        }
+
+                        default: {
+                            sendMsg(currentChatId, "неизвестная команда");
+                        }
+                    }
+                }
+
+
             }
 
 
-            SendMessage sendMessage = new SendMessage().setChatId(currentChatId);
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-            sendMessage.setText(getMessage(messageFromTelegram, currenMessage));
-
-
-            try {
-                execute(sendMessage);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
         }
+
     }
 
     public String getBotUsername() {
@@ -152,79 +183,4 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public String getMessage(String msg, String returnMessage) {
-
-        BotUser currentUser = botUserService.getUser(currentUserId);
-        ArrayList<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        KeyboardRow keyboardSecondRow = new KeyboardRow();
-
-        replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(false);
-
-        if (msg.equals("/start")) {
-            initKeyboard(keyboard, keyboardFirstRow, keyboardSecondRow);
-            return "Здравствуйте " + telegramUserFirstName + ", Выберите интересующий Вас раздел ⬆️";
-        }
-
-        if (msg.equals("События\uD83D\uDE18\uD83D\uDE04")) {
-            keyboard.clear();
-            keyboardFirstRow.clear();
-            //keyboardFirstRow.add("1-");
-            //keyboardFirstRow.add("2-");
-            keyboardSecondRow.add("Главное Меню⬆️");
-            //keyboard.add(keyboardFirstRow);
-            keyboard.add(keyboardSecondRow);
-            replyKeyboardMarkup.setKeyboard(keyboard);
-            return "Актуальные мероприятия в вашем районе: ";
-        }
-        //____________________________________________________
-
-        if (msg.equals("Регион оповещения")) {
-//            if (!botUserService.isUserExistById(currentUserId)) {
-//                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
-//            }
-            keyboard.clear();
-            keyboardFirstRow.clear();
-            keyboardFirstRow.add("Василеостровский");
-            keyboardFirstRow.add("Петроградский");
-            keyboardSecondRow.add("Главное Меню⬆️");
-            keyboard.add(keyboardFirstRow);
-            keyboard.add(keyboardSecondRow);
-            replyKeyboardMarkup.setKeyboard(keyboard);
-            setContextToUser(currentUserId, "regionOfAlert");
-            return "Выберите регион оповещения: ";
-
-        }
-        //--------------- THE MOST LAST MENU ---------------//
-
-        if (msg.equals("Главное Меню⬆️")) {
-
-            initKeyboard(keyboard, keyboardFirstRow, keyboardSecondRow);
-            keyboard.clear();
-            keyboardFirstRow.clear();
-            keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
-            keyboardFirstRow.add("Доб.Событие");
-            keyboardSecondRow.add("Обратная Связь\uD83E\uDD19");
-            keyboard.add(keyboardFirstRow);
-            keyboard.add(keyboardSecondRow);
-            replyKeyboardMarkup.setKeyboard(keyboard);
-            return telegramUserFirstName + ", Выберите интересующий Вас раздел";
-        }
-
-        return "Спасибо что выбрали нашу Авиакомпанию, всего хорошего Вам " + telegramUserFirstName;
-        //return returnMessage;
-    }
-
-    private void initKeyboard(ArrayList<KeyboardRow> keyboard, KeyboardRow keyboardFirstRow, KeyboardRow keyboardSecondRow) {
-        keyboard.clear();
-        keyboardFirstRow.clear();
-        keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
-        keyboardFirstRow.add("Регион оповещения");
-        keyboardSecondRow.add("Главное Меню⬆️");
-        keyboard.add(keyboardFirstRow);
-        keyboard.add(keyboardSecondRow);
-        replyKeyboardMarkup.setKeyboard(keyboard);
-    }
 }
