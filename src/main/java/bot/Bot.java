@@ -31,8 +31,8 @@ public class Bot extends TelegramLongPollingBot {
 //    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 
     //Stas
-//    private static final String BOT_NAME = "cas_to_everyone_bot";
-//    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
+    private static final String BOT_NAME = "cas_to_everyone_bot";
+    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
 
     //Yuri
 //    private static final String BOT_NAME = "balabbolBot";
@@ -106,15 +106,8 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setOneTimeKeyboard(false);
 
         if(msg.equals("/start")) {
-            keyboard.clear();
-            keyboardFirstRow.clear();
-            keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
-            keyboardFirstRow.add("Доб.Событие");
-            keyboardSecondRow.add("Обратная Связь\uD83E\uDD19");
-            keyboard.add(keyboardFirstRow);
-            keyboard.add(keyboardSecondRow);
-            replyKeyboardMarkup.setKeyboard(keyboard);
-            return "Здравствуйте " + userFirstName + ", Выберите интересующий Вас раздел";
+            initKeyboard(keyboard, keyboardFirstRow, keyboardSecondRow);
+            return "Здравствуйте " + userFirstName + ", Выберите интересующий Вас раздел ⬆️";
         }
 
         if(msg.equals("События\uD83D\uDE18\uD83D\uDE04")) {
@@ -126,37 +119,46 @@ public class Bot extends TelegramLongPollingBot {
             //keyboard.add(keyboardFirstRow);
             keyboard.add(keyboardSecondRow);
             replyKeyboardMarkup.setKeyboard(keyboard);
-            return "Актуальные мероприятия неподалеку от Вас: ";
+            return "Актуальные мероприятия в вашем районе: ";
         }
         //____________________________________________________
 
-        if(msg.equals("Доб.Событие")) {
+        if(msg.equals("Регион оповещения")) {
             keyboard.clear();
             keyboardFirstRow.clear();
-            keyboardFirstRow.add("11");
-            keyboardFirstRow.add("22");
+            keyboardFirstRow.add("Васелеостровский");
+            keyboardFirstRow.add("Петроградский");
             keyboardSecondRow.add("Главное Меню⬆️");
             keyboard.add(keyboardFirstRow);
             keyboard.add(keyboardSecondRow);
             replyKeyboardMarkup.setKeyboard(keyboard);
-            return "Выберите";
+            return "Выберите район, в котором Вам интересно получать информацию по мероприятиям: ТУТ СПИСОК ИЗ БАЗЫ МЕРОПРИЯТИЙ";
         }
+
+
+
+
+
 
         //--------------- THE MOST LAST MENU ---------------//
 
         if(msg.equals("Главное Меню⬆️")) {
 
-            keyboard.clear();
-            keyboardFirstRow.clear();
-            keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
-            keyboardFirstRow.add("Доб.Событие");
-            keyboardSecondRow.add("Обратная Связь\uD83E\uDD19");
-            keyboard.add(keyboardFirstRow);
-            keyboard.add(keyboardSecondRow);
-            replyKeyboardMarkup.setKeyboard(keyboard);
+            initKeyboard(keyboard, keyboardFirstRow, keyboardSecondRow);
             return userFirstName + ", Выберите интересующий Вас раздел";
         }
 
         return "Спасибо что выбрали нашу Авиакомпанию, всего хорошего Вам " + userFirstName;
+    }
+
+    private void initKeyboard(ArrayList<KeyboardRow> keyboard, KeyboardRow keyboardFirstRow, KeyboardRow keyboardSecondRow) {
+        keyboard.clear();
+        keyboardFirstRow.clear();
+        keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
+        keyboardFirstRow.add("Регион оповещения");
+        keyboardSecondRow.add("Главное Меню⬆️");
+        keyboard.add(keyboardFirstRow);
+        keyboard.add(keyboardSecondRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
     }
 }
