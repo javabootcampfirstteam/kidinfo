@@ -11,6 +11,7 @@ public class BotEvent {
     private String eventContact;
     private String eventPhone;
     private String eventAdditional;
+    private int eventOwner;
 
 
     public BotEvent(String eventName, String eventType, LocalDateTime eventDateTime, String eventLocation, String eventContact, String eventPhone, String eventAdditional) {

@@ -4,23 +4,17 @@ import dao.abstr.BotUserDao;
 import dao.impl.BotUserDaoImpl;
 import model.BotUser;
 import service.abstr.BotUserService;
-import storage.Storage;
 
-import java.util.ArrayList;
-import java.util.List;
+public class botUserServiceImpl implements BotUserService {
 
-public class BotUserServiceImpl implements BotUserService {
+    private static botUserServiceImpl instance;
 
-    private static BotUserServiceImpl instance;
-
-
-
-    private BotUserServiceImpl() {
+    private botUserServiceImpl() {
     }
 
-    public static BotUserServiceImpl getInstance(){
+    public static botUserServiceImpl getInstance(){
         if(instance==null){
-            instance = new BotUserServiceImpl();
+            instance = new botUserServiceImpl();
         }
         return instance;
     }

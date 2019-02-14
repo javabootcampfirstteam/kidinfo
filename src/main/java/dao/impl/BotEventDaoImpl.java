@@ -21,7 +21,7 @@ public class BotEventDaoImpl implements BotEventDao {
     }
 
     @Override
-    public void addBotEvent(int id, BotEvent botEvent) {
+    public void addBotEvent(BotEvent botEvent) {
         Storage.EVENTS_TABLE.put(Storage.eventIndex++,botEvent);
     }
 

@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.List;
 
-public class Registration {
+public class Context {
 
  /*   public void onUpdateReceived(Update update) {
 
