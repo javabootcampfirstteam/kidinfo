@@ -8,12 +8,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import service.abstr.BotEventService;
 import service.abstr.BotUserService;
-import service.impl.BotUserServiceImpl;
+import service.impl.botEventServiceImpl;
+import service.impl.botUserServiceImpl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +23,17 @@ import java.util.List;
 public class Bot extends TelegramLongPollingBot {
 
 
-    private long chat_id;
+    private Long currentChatId;
+    private Integer currentUserId;
+    private String telegramUserName;
     String lastMessage = "";
     ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(); // create keyboard
-    String userFirstName;
+    String telegramUserFirstName;
+    int contextPosition = 0;
 
     //Misha
-//    private static final String BOT_NAME = "KininfoTelegramBot";
-//    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+    private static final String BOT_NAME = "KininfoTelegramBot";
+    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 
     //Stas
 //    private static final String BOT_NAME = "cas_to_everyone_bot";
@@ -39,7 +44,8 @@ public class Bot extends TelegramLongPollingBot {
 //    private static final String BOT_TOKEN = "788017408:AAGhd7up3I-F2WhBBD60JXHGAXSn8xDLZ6w";
 
 
-    BotUserService botUserService = BotUserServiceImpl.getInstance();
+    BotUserService botUserService = botUserServiceImpl.getInstance();
+    BotEventService botEventService = botEventServiceImpl.getInstance();
 
     public Bot(DefaultBotOptions options) {
         super(options);
@@ -52,19 +58,69 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         //update.getUpdateId();
-        SendMessage sendMessage = new SendMessage().setChatId(update.getMessage().getChatId());
-        chat_id = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
-        sendMessage.setReplyMarkup(replyKeyboardMarkup);
-        Message message = update.getMessage();
-        String telegramUserName = message.getFrom().getFirstName();
-        this.userFirstName = telegramUserName;
 
-        try {
-            sendMessage.setText(getMessage(text));
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        String eventName;
+        String eventType;
+        LocalDateTime eventDateTime;
+        String eventLocation;
+        String eventContact;
+        String eventPhone;
+        String eventAdditional;
+        int eventOwner;
+
+        //Получаем сообщение из апдейта
+        Message message = update.getMessage();
+        if (message != null & message.hasText()) {
+            //Получаем текст сообщения
+            String messageFromTelegram = message.getText();
+            //Получаем телеграмовского юзера
+            User userFromTelegram = message.getFrom();
+            //Получаем Имя юзера из телеграма
+            telegramUserName = userFromTelegram.getFirstName();
+            //Поучаем текущий userId
+            currentUserId = userFromTelegram.getId();
+            //Получаем текущий chatId
+            currentChatId = message.getChatId();
+            String currenMessage = null;
+
+
+            if (!botUserService.isUserExistById(currentUserId)) {
+                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
+            }
+
+            BotUser currentUser = botUserService.getUser(currentUserId);
+
+            List<String> currentContext = currentUser.getContext();
+
+            if (!currentContext.isEmpty()) {
+
+                switch (currentContext.get(contextPosition)) {
+                    case "regEvent":
+//                        if (currentContext.size() == contextPosition) {
+                        eventLocation = messageFromTelegram;
+                        setContextToUser(currentUserId, "nameEvent");
+                        currenMessage = "Введите название мероприятия";
+                        contextPosition++;
+//                        }
+                        break;
+                    case "nameEvent":
+                        eventName = messageFromTelegram;
+
+                        break;
+                }
+            }
+
+
+            SendMessage sendMessage = new SendMessage().setChatId(currentChatId);
+            sendMessage.setReplyMarkup(replyKeyboardMarkup);
+            sendMessage.setText(getMessage(messageFromTelegram, currenMessage));
+
+
+            try {
+                execute(sendMessage);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -95,7 +151,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public String getMessage(String msg) {
+    public String getMessage(String msg, String returnMessage) {
 
         ArrayList<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
@@ -105,7 +161,14 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
 
-        if(msg.equals("/start")) {
+        if (msg.equals("/start")) {
+
+
+//            BotUser currentUser = botUserService.getUser(currentUserId);
+            setContextToUser(currentUserId, msg);
+//            List<String> currentContext = currentUser.getContext();
+
+
             keyboard.clear();
             keyboardFirstRow.clear();
             keyboardFirstRow.add("События\uD83D\uDE18\uD83D\uDE04");
@@ -114,10 +177,10 @@ public class Bot extends TelegramLongPollingBot {
             keyboard.add(keyboardFirstRow);
             keyboard.add(keyboardSecondRow);
             replyKeyboardMarkup.setKeyboard(keyboard);
-            return "Здравствуйте " + userFirstName + ", Выберите интересующий Вас раздел";
+            return "Здравствуйте " + telegramUserFirstName + ", Выберите интересующий Вас раздел";
         }
 
-        if(msg.equals("События\uD83D\uDE18\uD83D\uDE04")) {
+        if (msg.equals("События\uD83D\uDE18\uD83D\uDE04")) {
             keyboard.clear();
             keyboardFirstRow.clear();
             //keyboardFirstRow.add("1-");
@@ -130,21 +193,27 @@ public class Bot extends TelegramLongPollingBot {
         }
         //____________________________________________________
 
-        if(msg.equals("Доб.Событие")) {
+        if (msg.equals("Доб.Событие")) {
+            if (!botUserService.isUserExistById(currentUserId)) {
+                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
+            }
             keyboard.clear();
             keyboardFirstRow.clear();
-            keyboardFirstRow.add("11");
-            keyboardFirstRow.add("22");
+//            keyboardFirstRow.add("11");
+//            keyboardFirstRow.add("22");
             keyboardSecondRow.add("Главное Меню⬆️");
             keyboard.add(keyboardFirstRow);
             keyboard.add(keyboardSecondRow);
             replyKeyboardMarkup.setKeyboard(keyboard);
-            return "Выберите";
+            setContextToUser(currentUserId, "regEvent");
+            return "Выберите район\n" +
+                    "1-Петроградский\n" +
+                    "2-Василеостровский\n";
         }
 
         //--------------- THE MOST LAST MENU ---------------//
 
-        if(msg.equals("Главное Меню⬆️")) {
+        if (msg.equals("Главное Меню⬆️")) {
 
             keyboard.clear();
             keyboardFirstRow.clear();
@@ -154,9 +223,10 @@ public class Bot extends TelegramLongPollingBot {
             keyboard.add(keyboardFirstRow);
             keyboard.add(keyboardSecondRow);
             replyKeyboardMarkup.setKeyboard(keyboard);
-            return userFirstName + ", Выберите интересующий Вас раздел";
+            return telegramUserFirstName + ", Выберите интересующий Вас раздел";
         }
 
-        return "Спасибо что выбрали нашу Авиакомпанию, всего хорошего Вам " + userFirstName;
+//        return "Спасибо что выбрали нашу Авиакомпанию, всего хорошего Вам " + telegramUserFirstName;
+        return returnMessage;
     }
 }

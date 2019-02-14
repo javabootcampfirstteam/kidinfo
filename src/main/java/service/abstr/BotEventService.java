@@ -3,7 +3,7 @@ package service.abstr;
 import model.BotEvent;
 
 public interface BotEventService {
-    void addEvent(Integer id, BotEvent botEvent);
+    void addEvent(BotEvent botEvent);
     BotEvent getEvent(Integer id);
     boolean isUserExistById(Integer id);
 }
