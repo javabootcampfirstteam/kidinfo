@@ -36,8 +36,8 @@ public class Bot extends TelegramLongPollingBot {
 //    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 
     //Stas
-    private static final String BOT_NAME = "cas_to_everyone_bot";
-    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
+//    private static final String BOT_NAME = "cas_to_everyone_bot";
+//    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
 
     //Yuri
 //    private static final String BOT_NAME = "balabbolBot";
@@ -105,6 +105,9 @@ public class Bot extends TelegramLongPollingBot {
                         eventName = messageFromTelegram;
 
                         break;
+
+                    case "regionOfAlert":
+                        currentUser.setLocation(messageFromTelegram);
                 }
             }
 
@@ -151,6 +154,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public String getMessage(String msg, String returnMessage) {
 
+        BotUser currentUser = botUserService.getUser(currentUserId);
         ArrayList<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         KeyboardRow keyboardSecondRow = new KeyboardRow();
@@ -159,7 +163,7 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
 
-        if(msg.equals("/start")) {
+        if (msg.equals("/start")) {
             initKeyboard(keyboard, keyboardFirstRow, keyboardSecondRow);
             return "Здравствуйте " + telegramUserFirstName + ", Выберите интересующий Вас раздел ⬆️";
         }
@@ -177,19 +181,19 @@ public class Bot extends TelegramLongPollingBot {
         }
         //____________________________________________________
 
-        if(msg.equals("Регион оповещения")) {
-            if (!botUserService.isUserExistById(currentUserId)) {
-                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
-            }
+        if (msg.equals("Регион оповещения")) {
+//            if (!botUserService.isUserExistById(currentUserId)) {
+//                botUserService.addUser(currentUserId, new BotUser(telegramUserName));
+//            }
             keyboard.clear();
             keyboardFirstRow.clear();
-            keyboardFirstRow.add("Васелеостровский");
+            keyboardFirstRow.add("Василеостровский");
             keyboardFirstRow.add("Петроградский");
             keyboardSecondRow.add("Главное Меню⬆️");
             keyboard.add(keyboardFirstRow);
             keyboard.add(keyboardSecondRow);
             replyKeyboardMarkup.setKeyboard(keyboard);
-            //setContextToUser(currentUserId, "regEvent");
+            setContextToUser(currentUserId, "regionOfAlert");
             return "Выберите регион оповещения: ";
 
         }
