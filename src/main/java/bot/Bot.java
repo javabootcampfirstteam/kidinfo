@@ -120,7 +120,7 @@ public class Bot extends TelegramLongPollingBot {
 
                                 break;
                         case "/listevents":
-                        if(botEventService.isEventExists()){
+                        if(!botEventService.isEventExists()){
                             sendMsg(currentChatId, "Список");
                         }
                             sendMsg(currentChatId,startMessage);
