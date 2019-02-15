@@ -5,12 +5,8 @@ public class Poin {
 	private double lng;
 	private String pointAdr;
 
-	public void setPointAdr(String pointAdr) {
-		this.pointAdr = pointAdr;
-	}
-	public String getPointAdr() {
-		return pointAdr;
-	}
+	public void setPointAdr(String pointAdr) {this.pointAdr = pointAdr;}
+	public String getPointAdr() {return pointAdr;}
 
 	public void setLatitude(double lat) {
 		this.lat = lat;
@@ -25,5 +21,4 @@ public class Poin {
 	public double getLongitude() {
 		return lng;
 	}
-
 }

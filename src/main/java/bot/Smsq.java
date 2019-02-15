@@ -16,12 +16,9 @@ import java.util.Base64;
 
  **/
 public class Smsq {
-    //	public static void main(String[] args) {
-
+//	public static void main(String[] args) {
 //		// TODO Auto-generated method stub
-
 //		sendSms("79031234567", "text", "TEST-SMS");
-
 //	}
 
 
