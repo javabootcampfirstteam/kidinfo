@@ -11,6 +11,8 @@ public class BotUser {
     private String surname;
     private String location;
     private String role;
+    private String myEvents;
+
 
     public void setRole(String role) {
         this.role = role;
@@ -50,4 +52,11 @@ public class BotUser {
         return context;
     }
 
+    public String getMyEvents() {
+        return myEvents;
+    }
+
+    public void setMyEvents(String myEvents) {
+        this.myEvents = myEvents;
+    }
 }
