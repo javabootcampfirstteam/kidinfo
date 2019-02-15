@@ -39,6 +39,6 @@ public class botEventServiceImpl implements BotEventService {
 
     @Override
     public boolean isEventExists() {
-        return botEventDao.countEvents() > 0;
+        return botEventDao.isEventExist();
     }
 }

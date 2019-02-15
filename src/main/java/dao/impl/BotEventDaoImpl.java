@@ -32,7 +32,7 @@ public class BotEventDaoImpl implements BotEventDao {
     }
 
     @Override
-    public int countEvents() {
-        return Storage.EVENTS_TABLE.size();
+    public boolean isEventExist() {
+        return Storage.EVENTS_TABLE.isEmpty();
     }
 }
