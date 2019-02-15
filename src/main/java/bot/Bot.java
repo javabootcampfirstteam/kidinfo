@@ -37,6 +37,9 @@ public class Bot extends TelegramLongPollingBot {
     Point eventLocation;
     String eventContact;
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
+
+
     //Misha
     private static final String BOT_NAME = "KininfoTelegramBot";
     private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
@@ -62,7 +65,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         String startMessage = "/reg - регистрация\n/info - информация\n/addevent - Добавить событие\n" +
-                "/listevents - Список мероприятий\n";
+                "/listevents - Список мероприятий\n/listmyevents - Список моих мероприятий";
         Message message = update.getMessage();
 
         if (message != null & message.hasText()) {
@@ -125,7 +128,6 @@ public class Bot extends TelegramLongPollingBot {
                             if (!botEventService.isEventExists()) {
                                 sendMsg(currentChatId, "Выберите мероприятие для добавление в \"Мои мероприятия\"");
                                 for (int i : Storage.EVENTS_TABLE.keySet()) {
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
                                     sendMsg(currentChatId, "/addtomyevent" + i + " - " + Storage.EVENTS_TABLE.get(i).getEventName() + ": " + Storage.EVENTS_TABLE.get(i).getEventDateTime().format(formatter) + "\n" +
                                             Storage.EVENTS_TABLE.get(i).getEventType() + "\n" + Storage.EVENTS_TABLE.get(i).getEventContact() + "\n" + Storage.EVENTS_TABLE.get(i).getEventLocation().getPointAdr() + "\n---\n");
                                     setContextToUser(currentUserId, "/addtomyevent");
@@ -133,6 +135,20 @@ public class Bot extends TelegramLongPollingBot {
                             } else {
                                 sendMsg(currentChatId, startMessage);
                             }
+                            break;
+
+                        case "/listmyevents":
+                            if(!botUserService.getUser(currentUserId).getMyEvents().isEmpty()){
+                                List<Integer> myEvents = botUserService.getUser(currentUserId).getMyEvents();
+//                                Integer [] arr = new Integer[botUserService.getUser(currentUserId).getMyEvents().size()];
+                                for(Integer i:myEvents){
+//                                for(Integer i: arr){
+                                    BotEvent currentEvent = botEventService.getEvent(i);
+                                    sendMsg(currentChatId,"Мои события\n" + currentEvent.getEventName() +
+                                            " - " +
+                                            currentEvent.getEventDateTime().format(formatter) + "\n" + currentEvent.getEventLocation().getPointAdr() + "\n---\n" );
+                                }
+                            }sendMsg(currentChatId, startMessage);
                             break;
                         default: {
                             sendMsg(currentChatId, "Неизвестная команда");
@@ -145,7 +161,7 @@ public class Bot extends TelegramLongPollingBot {
                     if (messageFromTelegram.contains("/addtomyevent")) {
 //                        ArrayList<Integer> myEvents = botEventService.getEvent(Integer.parseInt(messageFromTelegram)).getMyEvents();
 //                        myEvents.add(Integer.parseInt(messageFromTelegram.substring(11,messageFromTelegram.length()-1)));
-                        botUserService.getUser(currentUserId).setMyEvents(Integer.parseInt(messageFromTelegram.substring(13,messageFromTelegram.length())));
+                        botUserService.getUser(currentUserId).setMyEvents(Integer.parseInt(messageFromTelegram.substring(13, messageFromTelegram.length())));
                         sendMsg(currentChatId, startMessage);
                         currentContext.clear();
 

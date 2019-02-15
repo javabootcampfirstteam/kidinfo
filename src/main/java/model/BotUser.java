@@ -56,4 +56,8 @@ public class BotUser {
     public void setMyEvents(Integer eventId) {
         this.myEvents.add(eventId);
     }
+
+    public List<Integer> getMyEvents() {
+        return myEvents;
+    }
 }
