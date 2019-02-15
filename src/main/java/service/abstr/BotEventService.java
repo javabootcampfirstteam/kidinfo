@@ -7,4 +7,5 @@ public interface BotEventService {
     BotEvent getEvent(Integer id);
     boolean isEventExistById(Integer id);
     boolean isEventExists();
+
 }

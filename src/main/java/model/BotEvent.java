@@ -3,6 +3,7 @@ package model;
 import bot.Point;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class BotEvent {
 
@@ -13,6 +14,8 @@ public class BotEvent {
     private String eventContact;
     private String eventPhone;
     private Point eventLocation;
+//    private ArrayList<Integer> myEvents;
+    //    private String myEvents;
 //    private String eventAdditional;
 //    private int eventOwner;
 
@@ -46,4 +49,12 @@ public class BotEvent {
     public Point getEventLocation() {
         return eventLocation;
     }
+
+//    public void setMyEvents(ArrayList<Integer> myEvents) {
+//        this.myEvents = myEvents;
+//    }
+//
+//    public ArrayList<Integer> getMyEvents() {
+//        return myEvents;
+//    }
 }

@@ -11,7 +11,8 @@ public class BotUser {
     private String surname;
     private String location;
     private String role;
-    private String myEvents;
+    private List<Integer> myEvents = new ArrayList<>();
+
 
 
     public void setRole(String role) {
@@ -52,11 +53,7 @@ public class BotUser {
         return context;
     }
 
-    public String getMyEvents() {
-        return myEvents;
-    }
-
-    public void setMyEvents(String myEvents) {
-        this.myEvents = myEvents;
+    public void setMyEvents(Integer eventId) {
+        this.myEvents.add(eventId);
     }
 }

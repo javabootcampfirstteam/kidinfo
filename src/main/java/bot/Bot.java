@@ -62,7 +62,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         String startMessage = "/reg - регистрация\n/info - информация\n/addevent - Добавить событие\n" +
-                "/listevents - Список мероприятий";
+                "/listevents - Список мероприятий\n";
         Message message = update.getMessage();
 
         if (message != null & message.hasText()) {
@@ -126,7 +126,7 @@ public class Bot extends TelegramLongPollingBot {
                                 sendMsg(currentChatId, "Выберите мероприятие для добавление в \"Мои мероприятия\"");
                                 for (int i : Storage.EVENTS_TABLE.keySet()) {
                                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
-                                    sendMsg(currentChatId, "/" + i + " - " + Storage.EVENTS_TABLE.get(i).getEventName() + ": " + Storage.EVENTS_TABLE.get(i).getEventDateTime().format(formatter) + "\n" +
+                                    sendMsg(currentChatId, "/addtomyevent" + i + " - " + Storage.EVENTS_TABLE.get(i).getEventName() + ": " + Storage.EVENTS_TABLE.get(i).getEventDateTime().format(formatter) + "\n" +
                                             Storage.EVENTS_TABLE.get(i).getEventType() + "\n" + Storage.EVENTS_TABLE.get(i).getEventContact() + "\n" + Storage.EVENTS_TABLE.get(i).getEventLocation().getPointAdr() + "\n---\n");
                                     setContextToUser(currentUserId, "/addtomyevent");
                                 }
@@ -134,115 +134,124 @@ public class Bot extends TelegramLongPollingBot {
                                 sendMsg(currentChatId, startMessage);
                             }
                             break;
-                        case "/addtomyevent":
-                            break;
                         default: {
                             sendMsg(currentChatId, "Неизвестная команда");
                         }
                     }
 
-//Здесь уже будет непосрдественно обрабаотываться вложенность контекста и добавяление данных в базу.
+//Здесь уже будет непосрдественно обрабаотываться вложенность контекста и добавление данных в базу.
                 } else {
-                    int contextPosition = 0;
-                    switch (currentContext.get(contextPosition++)) {
+
+                    if (messageFromTelegram.contains("/addtomyevent")) {
+//                        ArrayList<Integer> myEvents = botEventService.getEvent(Integer.parseInt(messageFromTelegram)).getMyEvents();
+//                        myEvents.add(Integer.parseInt(messageFromTelegram.substring(11,messageFromTelegram.length()-1)));
+                        botUserService.getUser(currentUserId).setMyEvents(Integer.parseInt(messageFromTelegram.substring(13,messageFromTelegram.length())));
+                        sendMsg(currentChatId, startMessage);
+                        currentContext.clear();
+
+                    } else {
+
+                        int contextPosition = 0;
+                        switch (currentContext.get(contextPosition++)) {
 //                        Основной процесс регистрации
-                        case "/reg": {
-                            if (currentContext.size() == contextPosition) {
-                                currentUser.setName(messageFromTelegram);
-                                sendMsg(currentChatId, "Введите фамилию");
-                                setContextToUser(currentUserId, "/surname");
-                            } else {
-                                switch (currentContext.get(contextPosition++)) {
-                                    case "/surname":
-                                        if (currentContext.size() == contextPosition) {
-                                            currentUser.setSurname(messageFromTelegram);
-                                            sendMsg(currentChatId, "Ваша роль");
-                                            setContextToUser(currentUserId, "/role");
-                                            String[] role = {"Админ", "Ребенок", "Родитель"};
-                                            createButtons(message, role, "Ваша роль");
-                                        } else {
-                                            switch (currentContext.get(contextPosition++)) {
-                                                case "/role":
-                                                    currentUser.setRole(messageFromTelegram);
-                                                    sendMsg(currentChatId, startMessage);
-                                                    currentContext.clear();
-                                                    break;
+                            case "/reg": {
+                                if (currentContext.size() == contextPosition) {
+                                    currentUser.setName(messageFromTelegram);
+                                    sendMsg(currentChatId, "Введите фамилию");
+                                    setContextToUser(currentUserId, "/surname");
+                                } else {
+                                    switch (currentContext.get(contextPosition++)) {
+                                        case "/surname":
+                                            if (currentContext.size() == contextPosition) {
+                                                currentUser.setSurname(messageFromTelegram);
+                                                sendMsg(currentChatId, "Ваша роль");
+                                                setContextToUser(currentUserId, "/role");
+                                                String[] role = {"Админ", "Ребенок", "Родитель"};
+                                                createButtons(message, role, "Ваша роль");
+                                            } else {
+                                                switch (currentContext.get(contextPosition++)) {
+                                                    case "/role":
+                                                        currentUser.setRole(messageFromTelegram);
+                                                        sendMsg(currentChatId, startMessage);
+                                                        currentContext.clear();
+                                                        break;
+                                                }
                                             }
-                                        }
-                                        break;
+                                            break;
+                                    }
                                 }
+                                break;
                             }
-                            break;
-                        }
 //Основной процесс добавления ивента
-                        case "/addevent":
-                            if (currentContext.size() == contextPosition) {
-                                eventName = messageFromTelegram;
-                                setContextToUser(currentUserId, "/addeventtype");
-                                String[] eventType = {"Мастер-класс", "Соревнование"};
-                                createButtons(message, eventType, "Тип события:");
-                            } else {
-                                switch (currentContext.get(contextPosition++)) {
-                                    case "/addeventtype":
-                                        if (currentContext.size() == contextPosition) {
-                                            eventType = messageFromTelegram;
-                                            sendMsg(currentChatId, "Дата мероприятия в формате ДД.ММ.ГГ ЧЧ:ММ");
-                                            setContextToUser(currentUserId, "/eventdate");
-                                        } else {
-                                            switch (currentContext.get(contextPosition++)) {
-                                                case "/eventdate":
-                                                    if (currentContext.size() == contextPosition) {
-                                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
-                                                        eventDateTime = LocalDateTime.parse(messageFromTelegram, formatter);
-                                                        sendMsg(currentChatId, "Контакт администратора");
-                                                        setContextToUser(currentUserId, "/eventcontact");
-                                                    } else {
-                                                        switch (currentContext.get(contextPosition++)) {
-                                                            case "/eventcontact":
-                                                                if (currentContext.size() == contextPosition) {
-                                                                    eventContact = messageFromTelegram;
+                            case "/addevent":
+                                if (currentContext.size() == contextPosition) {
+                                    eventName = messageFromTelegram;
+                                    setContextToUser(currentUserId, "/addeventtype");
+                                    String[] eventType = {"Мастер-класс", "Соревнование"};
+                                    createButtons(message, eventType, "Тип события:");
+                                } else {
+                                    switch (currentContext.get(contextPosition++)) {
+                                        case "/addeventtype":
+                                            if (currentContext.size() == contextPosition) {
+                                                eventType = messageFromTelegram;
+                                                sendMsg(currentChatId, "Дата мероприятия в формате ДД.ММ.ГГ ЧЧ:ММ");
+                                                setContextToUser(currentUserId, "/eventdate");
+                                            } else {
+                                                switch (currentContext.get(contextPosition++)) {
+                                                    case "/eventdate":
+                                                        if (currentContext.size() == contextPosition) {
+                                                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
+                                                            eventDateTime = LocalDateTime.parse(messageFromTelegram, formatter);
+                                                            sendMsg(currentChatId, "Контакт администратора");
+                                                            setContextToUser(currentUserId, "/eventcontact");
+                                                        } else {
+                                                            switch (currentContext.get(contextPosition++)) {
+                                                                case "/eventcontact":
+                                                                    if (currentContext.size() == contextPosition) {
+                                                                        eventContact = messageFromTelegram;
 //																	BotEvent botEvent = new BotEvent(eventName, eventType, eventDateTime, eventContact);
 //																	botEventService.addEvent(botEvent);
-																	sendMsg(currentChatId, "Адрес:");
-                                                                    setContextToUser(currentUserId, "/eventlocation");
-                                                                } else {
-                                                                    switch (currentContext.get(contextPosition++)) {
-                                                                        case "/eventlocation":
-                                                                            if (currentContext.size() == contextPosition) {
-                                                                                try {
-                                                                                    eventLocation = getPointByAdres(messageFromTelegram);
-                                                                                } catch (IOException e) {
-                                                                                    e.printStackTrace();
+                                                                        sendMsg(currentChatId, "Адрес:");
+                                                                        setContextToUser(currentUserId, "/eventlocation");
+                                                                    } else {
+                                                                        switch (currentContext.get(contextPosition++)) {
+                                                                            case "/eventlocation":
+                                                                                if (currentContext.size() == contextPosition) {
+                                                                                    try {
+                                                                                        eventLocation = getPointByAdres(messageFromTelegram);
+                                                                                    } catch (IOException e) {
+                                                                                        e.printStackTrace();
+                                                                                    }
+                                                                                    BotEvent botEvent = new BotEvent(eventName, eventType, eventDateTime, eventContact, eventLocation);
+                                                                                    botEventService.addEvent(botEvent);
+                                                                                    sendMsg(currentChatId, startMessage);
+                                                                                    currentContext.clear();
                                                                                 }
-                                                                                BotEvent botEvent = new BotEvent(eventName, eventType, eventDateTime, eventContact,eventLocation);
-                                                                                botEventService.addEvent(botEvent);
-                                                                                sendMsg(currentChatId, startMessage);
-                                                                                currentContext.clear();
-                                                                            }
+                                                                        }
                                                                     }
-                                                                }
+                                                            }
                                                         }
-                                                    }
+                                                }
                                             }
-                                        }
+                                    }
                                 }
+                                break;
+
+                            case "/info": {
+
+
+                                break;
                             }
-                            break;
+                            case "/listevents": {
+                                // проверка роли
+                                sendMsg(currentChatId, "список");
+                                break;
+                            }
 
-                        case "/info": {
-
-
-                            break;
-                        }
-                        case "/listevents": {
-                            // проверка роли
-                            sendMsg(currentChatId, "список");
-                            break;
-                        }
-
-                        default: {
-                            sendMsg(currentChatId, "неизвестная команда");
-                            sendMsg(currentChatId, startMessage);
+                            default: {
+                                sendMsg(currentChatId, "неизвестная команда");
+                                sendMsg(currentChatId, startMessage);
+                            }
                         }
                     }
                 }
