@@ -35,4 +35,5 @@ public class BotEventDaoImpl implements BotEventDao {
     public boolean isEventExist() {
         return Storage.EVENTS_TABLE.isEmpty();
     }
+
 }

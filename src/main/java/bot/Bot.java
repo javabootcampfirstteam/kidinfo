@@ -19,9 +19,7 @@ import storage.Storage;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Bot extends TelegramLongPollingBot {
 
@@ -40,8 +38,8 @@ public class Bot extends TelegramLongPollingBot {
     String telegramUserFirstName;
 
     //Misha
-//    private static final String BOT_NAME = "KininfoTelegramBot";
-//    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+    private static final String BOT_NAME = "KininfoTelegramBot";
+    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
     //Stas
 //    private static final String BOT_NAME = "cas_to_everyone_bot";
 //    private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
@@ -127,12 +125,15 @@ public class Bot extends TelegramLongPollingBot {
                                 break;
                         case "/listevents":
                         if(!botEventService.isEventExists()){
-                            for (BotEvent i:Storage.EVENTS_TABLE.values()) {
+                            sendMsg(currentChatId,"Выберите мероприятие для добавление в \"Мои мероприятия\"");
+
+                            for(int i:Storage.EVENTS_TABLE.keySet()){
                                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
-                                sendMsg(currentChatId, i.getEventType() + "\n" + i.getEventName() + "\n" + i.getEventDateTime().format(formatter) + "\n" + i.getEventContact() + "\n-----\n");
+                                sendMsg(currentChatId, "/" + i +" - " + Storage.EVENTS_TABLE.get(i).getEventName() + ": " + Storage.EVENTS_TABLE.get(i).getEventDateTime().format(formatter) + "\n" +
+                                        Storage.EVENTS_TABLE.get(i).getEventType() + Storage.EVENTS_TABLE.get(i).getEventContact() + "\n---\n");
                             }
-                        }
-                            sendMsg(currentChatId,startMessage);
+                        } else {
+                            sendMsg(currentChatId,startMessage);}
                             break;
                         default: {
                             sendMsg(currentChatId, "Неизвестная команда");
