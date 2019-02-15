@@ -1,6 +1,6 @@
 package bot;
 
-public class Poin {
+public class Point {
 	private double lat;
 	private double lng;
 	private String pointAdr;
