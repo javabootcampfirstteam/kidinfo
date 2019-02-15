@@ -1,4 +1,4 @@
-package Test_02;
+package bot;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

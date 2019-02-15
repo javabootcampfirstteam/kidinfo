@@ -36,14 +36,13 @@ public class Smsq {
         double tmp = number * pow;
 // Заремил математическое округление
 //		return (double) (int) ((tmp - (int) tmp) >= 0.5 ? tmp + 1 : tmp) / pow;
-        System.out.println((double) (int) (tmp) / pow);
+        System.out.println("Результат округления = " + ((double) (int) (tmp) / pow));
 
     }
 
 
 
     public static void sendSms(String phone, String text, String sender){
-
         try {
             String name = "freegastello";
             String password = "fksddgs2484";
