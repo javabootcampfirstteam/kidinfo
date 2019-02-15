@@ -27,6 +27,12 @@ public class BotEventDaoImpl implements BotEventDao {
 
     @Override
     public BotEvent[] getAllEvent() {
-        return new BotEvent[0];
+//        return Storage.EVENTS_TABLE.values();
+        return null;
+    }
+
+    @Override
+    public int countEvents() {
+        return Storage.EVENTS_TABLE.size();
     }
 }
