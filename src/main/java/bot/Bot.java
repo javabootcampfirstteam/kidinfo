@@ -30,19 +30,12 @@ public class Bot extends TelegramLongPollingBot {
     LocalDateTime eventDateTime;
     String eventLocation;
     String eventContact;
-    String eventPhone;
-    String eventAdditional;
-    int eventOwner;
-
 
     private Long currentChatId;
     private Integer currentUserId;
     private String telegramUserName;
-    String lastMessage = "";
-
 
     String telegramUserFirstName;
-    int contextPosition = 0;
 
     //Misha
     private static final String BOT_NAME = "KininfoTelegramBot";
@@ -69,7 +62,8 @@ public class Bot extends TelegramLongPollingBot {
 
 
     public void onUpdateReceived(Update update) {
-
+        String startMessage="/reg - регистрация\n/info - информация\n/addevent - Добавить событие\n" +
+                "/listevents - Список мероприятий";
         Message message = update.getMessage();
 
 
@@ -86,13 +80,14 @@ public class Bot extends TelegramLongPollingBot {
                 if (!botUserService.isUserExistById(currentUserId)) {
                     //Пользователя нет в базе
 //                    sendMsg(currentChatId, "Привет " + telegramUserName + ", вы впервые у нас, добавляем вас в базу");
-                    sendMsg(currentChatId, "/reg - регистрация\n/info - информация\n/addevent - Добавить событие");
+                    sendMsg(currentChatId,startMessage);
                     botUserService.addUser(currentUserId, new BotUser(telegramUserName));
-                } //else
+                } else
 //                    пользователь есть в базе
-//                {
+                {
+                    sendMsg(currentChatId,startMessage);
 //                    sendMsg(currentChatId, "Привет " + botUserService.getUser(currentUserId).getName() + ", Мы уже знакомы с вами!");
-//                }
+                }
 
 //Пользователь вводит отличное от /start
             } else {
@@ -106,21 +101,30 @@ public class Bot extends TelegramLongPollingBot {
                         case "/reg": {
                             sendMsg(currentChatId, "Регистрация\nВведите имя");
                             setContextToUser(currentUserId, "/reg");
-
+//                            sendMsg(currentChatId, startMessage);
                             break;
                         }
                         case "/info": {
                             sendMsg(currentChatId, "Информация");
-                            setContextToUser(currentUserId, "/info");
+                            sendMsg(currentChatId, startMessage);
                             break;
                         }
 
                         case "/addevent":
-                            sendMsg(currentChatId, "Добавить событие\nВведите название события");
-                            setContextToUser(currentUserId, messageFromTelegram);
-//                            System.out.println("w");
-                            break;
+                            if (botUserService.getUser(currentUserId).getRole() != null) {
+                                sendMsg(currentChatId, "Добавить событие\nВведите название события");
+                                setContextToUser(currentUserId, messageFromTelegram);
+                            } else{
+                                sendMsg(currentChatId, "Не соответствующая роль\n" + startMessage);
+                            }
 
+                                break;
+                        case "/listevents":
+                        if(botEventService.isEventExists()){
+                            sendMsg(currentChatId, "Список");
+                        }
+                            sendMsg(currentChatId,startMessage);
+                            break;
                         default: {
                             sendMsg(currentChatId, "Неизвестная команда");
                         }
@@ -143,13 +147,13 @@ public class Bot extends TelegramLongPollingBot {
                                             currentUser.setSurname(messageFromTelegram);
                                             sendMsg(currentChatId, "Ваша роль");
                                             setContextToUser(currentUserId, "/role");
-                                            String[] role = {"Админ","Ребенок","Родитель"};
+                                            String[] role = {"Админ", "Ребенок", "Родитель"};
                                             createButtons(message, role, "Ваша роль");
                                         } else {
                                             switch (currentContext.get(contextPosition++)) {
                                                 case "/role":
                                                     currentUser.setRole(messageFromTelegram);
-                                                    sendMsg(currentChatId, "Регистрация окончена");
+                                                    sendMsg(currentChatId,startMessage);
                                                     currentContext.clear();
                                                     break;
                                             }
@@ -188,7 +192,7 @@ public class Bot extends TelegramLongPollingBot {
                                                                     eventContact = messageFromTelegram;
                                                                     BotEvent botEvent = new BotEvent(eventName, eventType, eventDateTime, eventContact);
                                                                     botEventService.addEvent(botEvent);
-                                                                    sendMsg(currentChatId, "Событие добавлено!\n/reg - регистрация\n/info - информация\n/addevent - Добавить событие");
+                                                                    sendMsg(currentChatId, startMessage);
                                                                     currentContext.clear();
                                                                 }
                                                         }
@@ -204,7 +208,7 @@ public class Bot extends TelegramLongPollingBot {
 
                             break;
                         }
-                        case "/list_activities": {
+                        case "/listevents": {
                             // проверка роли
                             sendMsg(currentChatId, "список");
                             break;
@@ -212,6 +216,7 @@ public class Bot extends TelegramLongPollingBot {
 
                         default: {
                             sendMsg(currentChatId, "неизвестная команда");
+                            sendMsg(currentChatId, startMessage);
                         }
                     }
                 }
