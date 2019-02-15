@@ -16,6 +16,10 @@ public class BotUser {
         this.role = role;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     public BotUser(String telegramName) {
         this.telegramName = telegramName;
     }
