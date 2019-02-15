@@ -37,8 +37,4 @@ public class botUserServiceImpl implements BotUserService {
     return botUserDao.getBotUserById(id) != null;
     }
 
-//    @Override
-//    public void updateUser(Integer id, BotUser botUser) {
-//        botUserDao.upda
-//    }
 }

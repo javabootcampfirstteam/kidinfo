@@ -126,14 +126,16 @@ public class Bot extends TelegramLongPollingBot {
                         case "/listevents":
                         if(!botEventService.isEventExists()){
                             sendMsg(currentChatId,"Выберите мероприятие для добавление в \"Мои мероприятия\"");
-
-                            for(int i:Storage.EVENTS_TABLE.keySet()){
+                            for(int i:Storage0.EVENTS_TABLE.keySet()){
                                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
                                 sendMsg(currentChatId, "/" + i +" - " + Storage.EVENTS_TABLE.get(i).getEventName() + ": " + Storage.EVENTS_TABLE.get(i).getEventDateTime().format(formatter) + "\n" +
                                         Storage.EVENTS_TABLE.get(i).getEventType() + Storage.EVENTS_TABLE.get(i).getEventContact() + "\n---\n");
+                                setContextToUser(currentUserId, "/addtomyevent");
                             }
                         } else {
                             sendMsg(currentChatId,startMessage);}
+                            break;
+                        case "/addtomyevent":
                             break;
                         default: {
                             sendMsg(currentChatId, "Неизвестная команда");
