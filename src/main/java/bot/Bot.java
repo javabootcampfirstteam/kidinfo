@@ -53,8 +53,8 @@ public class Bot extends TelegramLongPollingBot {
 //    private static final String BOT_NAME = "balabbolBot";
 //    private static final String BOT_TOKEN = "788017408:AAGhd7up3I-F2WhBBD60JXHGAXSn8xDLZ6w";
 
-    BotUserService botUserService = botUserServiceImpl.getInstance();
-    BotEventService botEventService = botEventServiceImpl.getInstance();
+//    BotUserService botUserService = botUserServiceImpl.getInstance();
+//    BotEventService botEventService = botEventServiceImpl.getInstance();
 
     public Bot(DefaultBotOptions options) {
         super(options);
