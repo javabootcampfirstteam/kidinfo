@@ -18,12 +18,11 @@ public class Main {
 //		String text = "Санкт-Петербург Юкковское шоссе 17";
 //		Point p = getPointByAdres(text);
 //		double latitudeX = p.getLatitude();// 60.11172
-//      System.out.println("getLatitude = " + p.getLatitude());
 //		double latitudeXBetween = 0.002;
 //		double longitudeX = p.getLongitude();// 30.267897
-//      System.out.println("getLongitude = " + p.getLongitude());
 //		double longitudeBetween = 0.003;
 //		String pointAdr = p.getPointAdr();
+
 //		roundOut(latitudeX, 3);
 //		roundOut(longitudeX, 3);
 

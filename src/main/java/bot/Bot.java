@@ -40,9 +40,12 @@ public class Bot extends TelegramLongPollingBot {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
 
 
+		String telFrom = "79213275090";
+		String senderFrom = "TEST-SMS";
+
     //Misha
-//    private static final String BOT_NAME = "KininfoTelegramBot";
-//    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+    private static final String BOT_NAME = "KininfoTelegramBot";
+    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 //	Stas
 //	private static final String BOT_NAME = "cas_to_everyone_bot";
 //	private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
@@ -67,13 +70,39 @@ public class Bot extends TelegramLongPollingBot {
         String startMessage = "/reg - регистрация\n/info - информация\n/addevent - Добавить событие\n" +
                 "/listevents - Список мероприятий\n/listmyevents - Список моих мероприятий";
         Message message = update.getMessage();
+        String messageFromTelegram = message.getText();
+        User userFromTelegram = message.getFrom();
+        String telegramUserName = userFromTelegram.getFirstName();
+        Integer currentUserId = userFromTelegram.getId();
+        Long currentChatId = message.getChatId();
+
+
+        if(message.getLocation()!=null){
+            double currentLatitude = message.getLocation().getLatitude();
+            double currentLongitude = message.getLocation().getLongitude();
+//            botUserService.getUser(currentUserId).getLocation();
+            if(!botUserService.getUser(currentUserId).getMyEvents().isEmpty()){
+                List<Integer> myEvents = botUserService.getUser(currentUserId).getMyEvents();
+                for(Integer i:myEvents){
+                    double eventLatitude = botEventService.getEvent(i).getEventLocation().getLatitude();
+                    double eventLongitude = botEventService.getEvent(i).getEventLocation().getLongitude();
+                    if(((eventLatitude-0.002)<currentLatitude & currentLatitude<(eventLatitude+0.002))
+                            &
+                            ((eventLongitude-0.003)<currentLongitude & currentLongitude<(currentLongitude+0.003))){
+                        Smsq.sendSms(telFrom,botUserService.getUser(currentUserId).getName() + " " + botUserService.getUser(currentUserId).getSurname()
+                                + " находится на " + botEventService.getEvent(i).getEventName(),senderFrom);
+                    }
+//                                for(Integer i: arr){
+//                    BotEvent currentEvent = botEventService.getEvent(i);
+//                    sendMsg(currentChatId,"Мои события\n" + currentEvent.getEventName() +
+//                            " - " +
+//                            currentEvent.getEventDateTime().format(formatter) + "\n" + currentEvent.getEventLocation().getPointAdr() + "\n---\n" );
+                }
+            }sendMsg(currentChatId, startMessage);
+
+        }
 
         if (message != null & message.hasText()) {
-            String messageFromTelegram = message.getText();
-            User userFromTelegram = message.getFrom();
-            String telegramUserName = userFromTelegram.getFirstName();
-            Integer currentUserId = userFromTelegram.getId();
-            Long currentChatId = message.getChatId();
 
             //Если юзером вводится команда /start
             if ("/start".equals(messageFromTelegram)) {
@@ -180,7 +209,7 @@ public class Bot extends TelegramLongPollingBot {
                                         case "/surname":
                                             if (currentContext.size() == contextPosition) {
                                                 currentUser.setSurname(messageFromTelegram);
-                                                sendMsg(currentChatId, "Ваша роль");
+//                                                sendMsg(currentChatId, "Ваша роль");
                                                 setContextToUser(currentUserId, "/role");
                                                 String[] role = {"Админ", "Ребенок", "Родитель"};
                                                 createButtons(message, role, "Ваша роль");

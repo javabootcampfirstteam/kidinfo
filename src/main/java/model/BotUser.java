@@ -60,4 +60,8 @@ public class BotUser {
     public List<Integer> getMyEvents() {
         return myEvents;
     }
+
+    public String getLocation() {
+        return location;
+    }
 }
