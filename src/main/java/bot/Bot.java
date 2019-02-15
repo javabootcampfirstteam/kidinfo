@@ -44,8 +44,8 @@ public class Bot extends TelegramLongPollingBot {
 		String senderFrom = "TEST-SMS";
 
     //Misha
-    private static final String BOT_NAME = "KininfoTelegramBot";
-    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+//    private static final String BOT_NAME = "KininfoTelegramBot";
+//    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 //	Stas
 //	private static final String BOT_NAME = "cas_to_everyone_bot";
 //	private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
@@ -53,8 +53,8 @@ public class Bot extends TelegramLongPollingBot {
 //    private static final String BOT_NAME = "balabbolBot";
 //    private static final String BOT_TOKEN = "788017408:AAGhd7up3I-F2WhBBD60JXHGAXSn8xDLZ6w";
 
-//    BotUserService botUserService = botUserServiceImpl.getInstance();
-//    BotEventService botEventService = botEventServiceImpl.getInstance();
+    BotUserService botUserService = botUserServiceImpl.getInstance();
+    BotEventService botEventService = botEventServiceImpl.getInstance();
 
     public Bot(DefaultBotOptions options) {
         super(options);
