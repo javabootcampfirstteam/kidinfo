@@ -23,4 +23,20 @@ public class BotEvent {
 //        this.eventPhone = eventPhone;
 //        this.eventAdditional = eventAdditional;
     }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public LocalDateTime getEventDateTime() {
+        return eventDateTime;
+    }
+
+    public String getEventContact() {
+        return eventContact;
+    }
 }

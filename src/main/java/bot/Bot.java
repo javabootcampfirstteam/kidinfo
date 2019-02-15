@@ -15,10 +15,12 @@ import service.abstr.BotEventService;
 import service.abstr.BotUserService;
 import service.impl.botEventServiceImpl;
 import service.impl.botUserServiceImpl;
+import storage.Storage;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
@@ -99,9 +101,13 @@ public class Bot extends TelegramLongPollingBot {
 
                     switch (messageFromTelegram) {
                         case "/reg": {
-                            sendMsg(currentChatId, "Регистрация\nВведите имя");
-                            setContextToUser(currentUserId, "/reg");
-//                            sendMsg(currentChatId, startMessage);
+                            if(botUserService.getUser(currentUserId).getRole()==null) {
+                                sendMsg(currentChatId, "Регистрация\nВведите имя");
+                                setContextToUser(currentUserId, "/reg");
+                            }else{
+                                sendMsg(currentChatId, "Уже зарегистрирован");
+                                sendMsg(currentChatId, startMessage);
+                            }
                             break;
                         }
                         case "/info": {
@@ -121,7 +127,10 @@ public class Bot extends TelegramLongPollingBot {
                                 break;
                         case "/listevents":
                         if(!botEventService.isEventExists()){
-                            sendMsg(currentChatId, "Список");
+                            for (BotEvent i:Storage.EVENTS_TABLE.values()) {
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
+                                sendMsg(currentChatId, i.getEventType() + "\n" + i.getEventName() + "\n" + i.getEventDateTime().format(formatter) + "\n" + i.getEventContact() + "\n-----\n");
+                            }
                         }
                             sendMsg(currentChatId,startMessage);
                             break;
