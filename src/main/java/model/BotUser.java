@@ -12,6 +12,7 @@ public class BotUser {
     private String location;
     private String role;
     private List<Integer> myEvents = new ArrayList<>();
+    private String phoneNumber;
 
 
 
@@ -63,5 +64,13 @@ public class BotUser {
 
     public String getLocation() {
         return location;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 }

@@ -40,12 +40,12 @@ public class Bot extends TelegramLongPollingBot {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yy HH:mm");
 
 
-		String telFrom = "79213275090";
-		String senderFrom = "TEST-SMS";
+    String telFrom = "79213275090";
+    String senderFrom = "TEST-SMS";
 
     //Misha
-//    private static final String BOT_NAME = "KininfoTelegramBot";
-//    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
+    private static final String BOT_NAME = "KininfoTelegramBot";
+    private static final String BOT_TOKEN = "667519149:AAH2_KLHbq-fUC4yj01iSPSgj7XohCM10bU";
 //	Stas
 //	private static final String BOT_NAME = "cas_to_everyone_bot";
 //	private static final String BOT_TOKEN = "666755919:AAEq93Nf-OLJ4r2zjhpUdICue5XAKI2q9Bc";
@@ -77,20 +77,20 @@ public class Bot extends TelegramLongPollingBot {
         Long currentChatId = message.getChatId();
 
 
-        if(message.getLocation()!=null){
+        if (message.getLocation() != null) {
             double currentLatitude = message.getLocation().getLatitude();
             double currentLongitude = message.getLocation().getLongitude();
 //            botUserService.getUser(currentUserId).getLocation();
-            if(!botUserService.getUser(currentUserId).getMyEvents().isEmpty()){
+            if (!botUserService.getUser(currentUserId).getMyEvents().isEmpty()) {
                 List<Integer> myEvents = botUserService.getUser(currentUserId).getMyEvents();
-                for(Integer i:myEvents){
+                for (Integer i : myEvents) {
                     double eventLatitude = botEventService.getEvent(i).getEventLocation().getLatitude();
                     double eventLongitude = botEventService.getEvent(i).getEventLocation().getLongitude();
-                    if(((eventLatitude-0.002)<currentLatitude & currentLatitude<(eventLatitude+0.002))
+                    if (((eventLatitude - 0.002) < currentLatitude & currentLatitude < (eventLatitude + 0.002))
                             &
-                            ((eventLongitude-0.003)<currentLongitude & currentLongitude<(currentLongitude+0.003))){
-                        Smsq.sendSms(telFrom,botUserService.getUser(currentUserId).getName() + " " + botUserService.getUser(currentUserId).getSurname()
-                                + " находится на " + botEventService.getEvent(i).getEventName(),senderFrom);
+                            ((eventLongitude - 0.003) < currentLongitude & currentLongitude < (currentLongitude + 0.003))) {
+                        Smsq.sendSms(botUserService.getUser(currentUserId).getPhoneNumber(), botUserService.getUser(currentUserId).getName() + " " + botUserService.getUser(currentUserId).getSurname()
+                                + " находится на " + botEventService.getEvent(i).getEventName(), senderFrom);
                     }
 //                                for(Integer i: arr){
 //                    BotEvent currentEvent = botEventService.getEvent(i);
@@ -98,7 +98,8 @@ public class Bot extends TelegramLongPollingBot {
 //                            " - " +
 //                            currentEvent.getEventDateTime().format(formatter) + "\n" + currentEvent.getEventLocation().getPointAdr() + "\n---\n" );
                 }
-            }sendMsg(currentChatId, startMessage);
+            }
+            sendMsg(currentChatId, startMessage);
 
         }
 
@@ -167,17 +168,18 @@ public class Bot extends TelegramLongPollingBot {
                             break;
 
                         case "/listmyevents":
-                            if(!botUserService.getUser(currentUserId).getMyEvents().isEmpty()){
+                            if (!botUserService.getUser(currentUserId).getMyEvents().isEmpty()) {
                                 List<Integer> myEvents = botUserService.getUser(currentUserId).getMyEvents();
 //                                Integer [] arr = new Integer[botUserService.getUser(currentUserId).getMyEvents().size()];
-                                for(Integer i:myEvents){
+                                for (Integer i : myEvents) {
 //                                for(Integer i: arr){
                                     BotEvent currentEvent = botEventService.getEvent(i);
-                                    sendMsg(currentChatId,"Мои события\n" + currentEvent.getEventName() +
+                                    sendMsg(currentChatId, "Мои события\n" + currentEvent.getEventName() +
                                             " - " +
-                                            currentEvent.getEventDateTime().format(formatter) + "\n" + currentEvent.getEventLocation().getPointAdr() + "\n---\n" );
+                                            currentEvent.getEventDateTime().format(formatter) + "\n" + currentEvent.getEventLocation().getPointAdr() + "\n---\n");
                                 }
-                            }sendMsg(currentChatId, startMessage);
+                            }
+//                            sendMsg(currentChatId, startMessage);
                             break;
                         default: {
                             sendMsg(currentChatId, "Неизвестная команда");
@@ -216,9 +218,22 @@ public class Bot extends TelegramLongPollingBot {
                                             } else {
                                                 switch (currentContext.get(contextPosition++)) {
                                                     case "/role":
-                                                        currentUser.setRole(messageFromTelegram);
-                                                        sendMsg(currentChatId, startMessage);
-                                                        currentContext.clear();
+                                                        if (currentContext.size() == contextPosition) {
+                                                            currentUser.setRole(messageFromTelegram);
+                                                            if (messageFromTelegram.equals("Ребенок")) {
+                                                                sendMsg(currentChatId, "Введите телефон родителя");
+                                                                setContextToUser(currentUserId, "/parenttel");
+                                                            } else {
+                                                                sendMsg(currentChatId, startMessage);
+                                                                currentContext.clear();
+                                                            }
+                                                        } else
+                                                            switch (currentContext.get(contextPosition++)) {
+                                                                case "/parenttel":
+                                                                    currentUser.setPhoneNumber(messageFromTelegram);
+                                                                    sendMsg(currentChatId, startMessage);
+                                                                    currentContext.clear();
+                                                            }
                                                         break;
                                                 }
                                             }
