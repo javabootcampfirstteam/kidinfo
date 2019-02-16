@@ -86,9 +86,9 @@ public class Bot extends TelegramLongPollingBot {
                 for (Integer i : myEvents) {
                     double eventLatitude = botEventService.getEvent(i).getEventLocation().getLatitude();
                     double eventLongitude = botEventService.getEvent(i).getEventLocation().getLongitude();
-                    if (((eventLatitude - 0.002) < currentLatitude & currentLatitude < (eventLatitude + 0.002))
+                    if (((eventLatitude - 0.05) < currentLatitude & currentLatitude < (eventLatitude + 0.05))
                             &
-                            ((eventLongitude - 0.003) < currentLongitude & currentLongitude < (currentLongitude + 0.003))) {
+                            ((eventLongitude - 0.05) < currentLongitude & currentLongitude < (currentLongitude + 0.05))) {
                         Smsq.sendSms(botUserService.getUser(currentUserId).getPhoneNumber(), botUserService.getUser(currentUserId).getName() + " " + botUserService.getUser(currentUserId).getSurname()
                                 + " находится на " + botEventService.getEvent(i).getEventName(), senderFrom);
                     }
